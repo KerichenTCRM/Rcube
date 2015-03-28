@@ -8,8 +8,8 @@ Le projet RCube, réalisé par quatre étudiants de première année de classe p
 * Cube (Rubik's Cube)
 * Face (Il y en a six sur le cube)
 * Facette (Il y en a 9 par face)
-* Bloc (Unité cubique mobile composants le cube)
-* Centre (Bloc a une facette, située au centre d'une face)
+* Bloc (Unité cubique mobile composant le cube)
+* Centre (Bloc à une facette, situé au centre d'une face)
 * Arrete (Bloc doté de deux facettes, situé sur deux faces, sur le bord. Il y en a quatre par face et 12 sur le cube.)
 * Sommet (Bloc doté de trois facettes, situé sur trois faces, dans les coins. Il y en a quatre par face et 8 sur le cube.)
 
@@ -22,7 +22,7 @@ Le projet RCube, réalisé par quatre étudiants de première année de classe p
         1 2 3
         4 5 6
         7 8 9
-## Appelle de l'algorithme
+## Appel de l'algorithme
 L'algorithme, codé en python, recevra un argument: une chaine de caractères de 59 caractères: six groupes de 9 caractères, séparés par des virgules. A chaque couleur de facette, l'utilisateur associera une lettre (ou un nombre). Chaque groupe de neuf caractères correspondra aux couleurs des facettes d'une face.
 
 #### Exemples
@@ -54,3 +54,18 @@ Propositions de caratérisation du cube:
 
         Avantage: observation et manipulation facile
         Inconvenient: maintient de deux descriptions du cube necessaire
+        
+## Caractérisation pratique des mouvements
+
+Propositions de caratérisation des mouvements:
+* Par le centre de la face et le sens de rotation(horaire/anti-horaire):
+
+        Avantage: manipulation facile pour l'utilisateur
+
+* Par un des 12 mouvements et une référence (face devant et dessus):
+        
+        Avantage: similaire au langage utilisé lors de l'apprentissage de la résolution
+        Inconvénient: nécessite une référence
+
+## Sortie de l'algorithme
+La réponse, en sortie de l'algorithme, sera une liste de mouvements.
