@@ -1,5 +1,5 @@
 # Rcube
-Algorithme de résolution du rubiks cube, basé sur les méthodes humaines.
+Algorithme de résolution du rubiks cube, basé sur les méthodes de résolution humaines.
 
 ## Bienvenue sur la page du projet RCube
 Le projet RCube, réalisé par quatre étudiants de première année de classe préparatoire, vise à créer un algorithme, qui à partir de l'énumération des couleurs des faces d'un Rubik's Cube, propose une suite de mouvements solution du cube.
