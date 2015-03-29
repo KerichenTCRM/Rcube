@@ -10,7 +10,7 @@ Le projet RCube, réalisé par quatre étudiants de première année de classe p
 * Facette (Il y en a 9 par face)
 * Bloc (Unité cubique mobile composant le cube)
 * Centre (Bloc à une facette, situé au centre d'une face)
-* Arrete (Bloc doté de deux facettes, situé sur deux faces, sur le bord. Il y en a quatre par face et 12 sur le cube.)
+* Arête (Bloc doté de deux facettes, situé sur deux faces, sur le bord. Il y en a quatre par face et 12 sur le cube.)
 * Sommet (Bloc doté de trois facettes, situé sur trois faces, dans les coins. Il y en a quatre par face et 8 sur le cube.)
 
 ## Ordre de lecture des facettes du cube
