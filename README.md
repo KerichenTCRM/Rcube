@@ -4,6 +4,24 @@ Algorithme de résolution du rubiks cube, basé sur les méthodes de résolution
 ## Bienvenue sur la page du projet RCube
 Le projet RCube, réalisé par quatre étudiants de première année de classe préparatoire, vise à créer un algorithme, qui à partir de l'énumération des couleurs des faces d'un Rubik's Cube, propose une suite de mouvements solution du cube.
 
+## Quelque liens
+- Lien 1 - Site web proposant une résolution en 20 coups ou moins du Rubiks Cube 3x3 :
+
+       http://rcombs.me/Cubes/?cube=clean
+
+- Lien 2 - Site web d'où provient l'algorithme utilisé par le site du lien 1 (je ne l'ai pas lu @Mathieu) :
+
+       http://kociemba.org/cube.htm
+
+- Lien 3 - Vidéo YouTube d'une machine qui résoud le Rubik's cube très très vite :
+
+       https://www.youtube.com/watch?v=qTq2V1aPAp8
+
+- Lien 4 - Vidéo Youtube d'ou proviennent les liens 1 et 2 :
+
+       https://www.youtube.com/watch?v=FJiDNkpGWXQ
+
+
 ## Lexique
 * Cube (Rubik's Cube)
 * Face (Il y en a six sur le cube)
