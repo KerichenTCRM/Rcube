@@ -21,6 +21,10 @@ Le projet RCube, réalisé par quatre étudiants de première année de classe p
 
        https://www.youtube.com/watch?v=FJiDNkpGWXQ
 
+- Lien 5 - Pour comprendre les déclaration de classes que j'utilise en Python (@Mathieu):
+
+       http://fr.wikibooks.org/wiki/Apprendre_%C3%A0_programmer_avec_Python/Classes,_m%C3%A9thodes,_h%C3%A9ritage
+
 
 ## Lexique
 * Cube (Rubik's Cube)
