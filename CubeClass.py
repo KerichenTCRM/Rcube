@@ -1,7 +1,7 @@
 #!/usr/bin/python3
-# Cube solver
+# Résolveur de Rubik's Cube
 
-# Génération de modèle
+# Génération de modèle, pour les testes de bon fonctionnement.
 def genModeleResolu (couleurs):
     """Génère une chaine de caractère décrivant un cube résolut."""
     (W,B,O,V,R,J) = couleurs
@@ -34,6 +34,7 @@ class Cube:
         (s.Wf, s.Bf, s.Of, s.Vf, s.Rf, s.Jf) = s.faces # Nous affectons aussi des nom à chaque face.
         valeurParCouleurSommet = {s.W:0, s.B:0, s.O:0, s.J:1, s.V:2, s.R:4}
         # [W-J:Axe 0: 1], [B-V:Axe 1: 2], [O-R:Axe 2: 4]
+        valeurParCouleurArete = {s.W:0,J:8,s.B:0,s.V:1,O:2,s.R:3} # A définir !
         s.sommets = [() for huit in range(8)] # Nous pré-créons ces huit valeur, pour pouvoir les affecter
         s.aretes = [() for douze in range(12)] # plus facilement ensuite, en utilisant les indices 'L[i]' uniquement.
         # Et pas 'L.append'
@@ -72,11 +73,36 @@ class Cube:
         num = sum([ valeurParCouleurSommet[x]  for x in bloc3f ])
         return (num,rotation)
         
-    valeurParCouleurArete = {W:0,J:4,B:0,V:1,O:2,R:3} # A définir !
+# Numérotation arbitraire des arètes:
+# . 2 .                   
+# 3 W 1                   
+# . 0 .                   
+# . 0 . . 1 . . 2 . . 3 . 
+# 7 B 4 4 O 5 5 V 6 6 R 7 
+# . 8 . . 9 . . A . . B . 
+#                   . B . 
+# [A = 10]          A J 8 
+# [B = 11]          . 9 . 
     def identifieArete (s,bloc2f):
         """ Caractérise une arête du cube, à partir de deux couleurs d'un bloc."""
         # bloc2f contient deux couleurs: deux facettes
-        # Identifions la rotation de l'arête:
+        # Identifions le numero du bloc:
+        num = 12
+        if s.W in bloc2f or s.J in bloc2f:
+            num = sum([ valeurParCouleurArete[x] for x in bloc2f ])
+        elif s.B in bloc2f:
+            if s.O in bloc2f:
+                num = 4
+            elif s.R in bloc2f:
+                num = 7
+        elif s.V in bloc2f:
+            if s.O in bloc2f:
+                num = 5
+            elif s.R in bloc2f:
+                num = 6
+        if num == 12:
+            return "Erreur d'arête dans la description du cube"
+        # Identifions maintenant la rotation de l'arête:
         rotation = 2
         for i,x in enumerate(bloc2f):
             if x == s.W or x == s.J: # Verification de la couleur de la facette.
@@ -87,9 +113,6 @@ class Cube:
                     rotation = i
         if rotation == 2:
             return "Erreur d'arête dans la description du cube"
-        # Identifions maintenant le numero du bloc.
-        # Le systeme d'identification ci-dessous est insuffisant. Il ne produit pas un nombre entre 0 et 11.
-        num = sum([ valeurParCouleurArete[x] for x in bloc2f ])
         return (num,rotation)
 
 
@@ -112,8 +135,8 @@ class Cube:
 # . B . . O . . V . . R . # 7 B 4 4 O 5 5 V 6 6 R 7 
 # 5 . 1 1 . 3 3 . 7 7 . 5 # . 8 . . 9 . . A . . B . 
 #                   7 . 5 #                   . B . 
-#                   . J . #                   A J 8 
-#                   3 . 1 #                   . 9 . 
+#                   . J . # [A = 10]          A J 8 
+#                   3 . 1 # [B = 11]          . 9 . 
 # [J:1, V:2, R:4]
 
     def groupSommets (s):
