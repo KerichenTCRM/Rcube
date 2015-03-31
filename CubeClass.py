@@ -16,12 +16,12 @@ def genModeleA (couleurs):
 
 class Cube:
     # Valeurs de la classe Cube (inutiles)
-    W = "w" # 0 # Dessus [W-J Axe 0]
-    B = "b" # 1 # En face [B-V Axe 1]
-    O = "o" # 2 # A droite [O-R Axe 2]
-    V = "v" # 3 # Derrière
-    R = "r" # 4 # A gauche
-    J = "j" # 5 # Dessous
+    #W = "w" # 0 # Dessus [W-J Axe 0]
+    #B = "b" # 1 # En face [B-V Axe 1]
+    #O = "o" # 2 # A droite [O-R Axe 2]
+    #V = "v" # 3 # Derrière
+    #R = "r" # 4 # A gauche
+    #J = "j" # 5 # Dessous
     
     modeleResolu = genModeleResolu([W,B,O,V,R,J])
     modeleA = genModeleA([W,B,O,V,R,J])
@@ -32,6 +32,8 @@ class Cube:
         s.couleurs = [ face[4] for face in s.faces ] # Le quatrième caractère est le centre de la face.
         (s.W, s.B, s.O, s.V, s.R, s.J) = s.couleurs # Nous affectons des noms spécifique à chaque couleur.
         (s.Wf, s.Bf, s.Of, s.Vf, s.Rf, s.Jf) = s.faces # Nous affectons aussi des nom à chaque face.
+        valeurParCouleurSommet = {s.W:0, s.B:0, s.O:0, s.J:1, s.V:2, s.R:4}
+        # [W-J:Axe 0: 1], [B-V:Axe 1: 2], [O-R:Axe 2: 4]
         s.sommets = [() for huit in range(8)] # Nous pré-créons ces huit valeur, pour pouvoir les affecter
         s.aretes = [() for douze in range(12)] # plus facilement ensuite, en utilisant les indices 'L[i]' uniquement.
         # Et pas 'L.append'
@@ -56,9 +58,6 @@ class Cube:
         s.modeleA = genModeleA(s.couleurs) # ~
 
     
-    valeurParCouleurSommet = {W:0, B:0, O:0, J:1, V:2, R:4}
-    # [W-J:Axe 0: 1], [B-V:Axe 1: 2], [O-R:Axe 2: 4]
-    
     def identifieSommet (s,bloc3f):
         """ Caractérise un sommet du cube, à partir de trois couleurs d'un bloc."""
         # bloc3f contient trois couleurs: trois facettes
@@ -78,7 +77,7 @@ class Cube:
         """ Caractérise une arête du cube, à partir de deux couleurs d'un bloc."""
         # bloc2f contient deux couleurs: deux facettes
         # Identifions la rotation de l'arête:
-        rotation == 2
+        rotation = 2
         for i,x in enumerate(bloc2f):
             if x == s.W or x == s.J: # Verification de la couleur de la facette.
                 rotation = i # Si une des deux facettes correspond, on le retient.
