@@ -27,6 +27,22 @@ class Cube:
     modeleA = genModeleA([W,B,O,V,R,J])
     
     def __init__ (s, chaineU):
+        
+        ## Initialisation (pré-création) de valeurs temporaires:
+        s.viSommets = [None]*8 # Nous pré-créons ces huit valeur, pour pouvoir les affecter
+        s.viAretes = [None]*12 # plus facilement ensuite, en utilisant les indices 'L[i]' uniquement.
+        # vi-* : Ces listes contiendronts la version 'VIsuel' des sommets et des arrets. (deux ou trois facettes)
+        
+        s.sommetsBloc = [None]*8
+        s.aretesBloc = [None]*12
+        # s.*sBloc: Ces listes donneront le numéro du bloc en fonction de numéro de position.
+        
+        s.sommetsPos = [None]*8
+        s.aretesPos = [None]*12
+        # s.*sPos: Ces listes donneront le numéro de position, en fonction du numéro de bloc.
+        # Fin de la pré-création #
+        
+        ## Définition de valeur propres au cube donné par l'utilisateur.
         s.faces = chaineU.split(',')
         # La facette n°4 (le centre) définit la couleur de la face :
         s.couleurs = [ face[4] for face in s.faces ] # Le quatrième caractère est le centre de la face.
@@ -34,10 +50,8 @@ class Cube:
         (s.Wf, s.Bf, s.Of, s.Vf, s.Rf, s.Jf) = s.faces # Nous affectons aussi des nom à chaque face.
         valeurParCouleurSommet = {s.W:0, s.B:0, s.O:0, s.J:1, s.V:2, s.R:4}
         # [W-J:Axe 0: 1], [B-V:Axe 1: 2], [O-R:Axe 2: 4]
-        valeurParCouleurArete = {s.W:0,J:8,s.B:0,s.V:1,O:2,s.R:3} # A définir !
-        s.sommets = [() for huit in range(8)] # Nous pré-créons ces huit valeur, pour pouvoir les affecter
-        s.aretes = [() for douze in range(12)] # plus facilement ensuite, en utilisant les indices 'L[i]' uniquement.
-        # Et pas 'L.append'
+        valeurParCouleurArete = {s.W:0,J:8,s.B:0,s.V:1,O:2,s.R:3}
+        
         s.couronneHaut = ''.join([ strg[0:3] for strg in s.faces[1:5]]) # On récupère les couronnes à différentes hauteurs
         s.couronneMil  = ''.join([ strg[3:6] for strg in s.faces[1:5]]) # Ceci facilitera l'identification ensuite.
         s.couronneBas  = ''.join([ strg[6:9] for strg in s.faces[1:5]])
@@ -72,7 +86,7 @@ class Cube:
         # Calculons le numero (entre 0 et 7) du sommet:
         num = sum([ valeurParCouleurSommet[x]  for x in bloc3f ])
         return (num,rotation)
-        
+
 # Numérotation arbitraire des arètes:
 # . 2 .                   
 # 3 W 1                   
@@ -143,10 +157,10 @@ class Cube:
         """Regroupe les facettes des sommets par 2, selon leur numéro, en vue de leur identification"""
         # On s'occupe des couches Haut et Bat en même temps. 
         for i,x in enumerate([0,1,3,2]): # Pour chaque sommet...
-            s.sommets[2*i]   = (s.anneauHaut[2*x],
+            s.viSommets[2*i]   = (s.anneauHaut[2*x],
                                  s.couronneHaut[(3*x+2)%12],
                                  s.couronneHaut[3*(x+1)%12])
-            s.sommets[2*i+1] = (s.anneauBas[2*x],
+            s.viSommets[2*i+1] = (s.anneauBas[2*x],
                                  s.couronneBas[3*(x+1)%12],
                                  s.couronneBas[(3*x+2)%12])
 
@@ -154,11 +168,26 @@ class Cube:
         """Regroupe les facettes des arêtes par 2, selon leur numéro, en vue de leur identification"""
         # Les quatres premières et quatre dernières arêtes de la liste peuvent s'identifier ainsi :
         for x in range(4):
-            s.aretes[x]   = (s.anneauHaut[2*x],s.couronneHaut[3*x+1])
-            s.aretes[8+x] = (s.anneauBas[2*x],s.couronneBas[3*x+1])
+            s.viAretes[x]   = (s.anneauHaut[2*x],s.couronneHaut[3*x+1])
+            s.viAretes[8+x] = (s.anneauBas[2*x],s.couronneBas[3*x+1])
         # Les arêtes suivantes sont identifiées manuellement :
-        s.aretes[4] = tuple(s.couronneMil[2:4])
-        s.aretes[5] = (s.couronneMil[6],s.couronneMil[5])
-        s.aretes[6] = tuple(s.couronneMil[8:10])
-        s.aretes[7] = (s.couronneMil[0],s.couronneMil[11])
+        s.viAretes[4] = tuple(s.couronneMil[2:4])
+        s.viAretes[5] = (s.couronneMil[6],s.couronneMil[5])
+        s.viAretes[6] = tuple(s.couronneMil[8:10])
+        s.viAretes[7] = (s.couronneMil[0],s.couronneMil[11])
+    
+    def mapSommets (s):
+        """Utilise la liste s.viSommet et la methode s.identifieSommet pour générer la double indexation position-bloc des sommets du cube. (Génère les listes s.sommetsBloc et s.sommetsPos)"""
+        # Remarque: s.viSommets indexe les BLOCS trouvés, pour chaque POSITION
+        for pos,sommet in enumerate(s.viSommets):
+            vu = identifieSommet(sommet)
+            s.sommetBloc[pos] = vu # A chaque position, on associe l'sommet correspondante
+            s.sommetPos[vu] = pos # A chaque sommet, on associe la position corespondante
         
+    def mapAretes (s):
+        """Utilise la liste s.viArete et la methode s.identifieArete pour générer la double indexation position-bloc des aretes du cube. (Génère les listes s.aretesBloc et s.aretesPos)"""
+        # Remarque: s.viAretes indexe les BLOCS trouvés, pour chaque POSITION
+        for pos,arete in enumerate(s.viArete):
+            vu = identifieArete(arete)
+            s.areteBloc[pos] = vu # A chaque position, on associe l'arête correspondante
+            s.aretePos[vu] = pos # A chaque arête, on associe la position corespondante
