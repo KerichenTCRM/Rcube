@@ -2,6 +2,9 @@
 # Résolveur de Rubik's Cube
 
 # Génération de modèle, pour les testes de bon fonctionnement.
+def genCouleurs ():
+    return ['w', 'b', 'o', 'v', 'r', 'j']
+
 def genModeleResolu (couleurs):
     """Génère une chaine de caractère décrivant un cube résolut."""
     (W,B,O,V,R,J) = couleurs
@@ -13,19 +16,29 @@ def genModeleA (couleurs):
     return ",".join([9*W,\
     6*B+J+B+R, 6*O+J+R+R, 6*V+B+O+O, 6*R+J+V+V,\
     B+J+O+J+J+J+J+J+V])
+    
+def genModeleB (couleurs):
+    """Génère une chaine de caractère décrivant un cube particulier, mais non-résolut."""
+    (W,B,O,V,R,J) = couleurs
+    return ",".join([O+W+W+W+W+W+W+W+R,\
+                     B+B+V+B+B+J+B+R+B, J+O+O+B+O+O+W+O+O, V+V+B+V+V+J+V+O+V, J+R+R+V+R+R+W+R+R,\
+                                                                              R+J+J+B+J+V+J+J+O])
+    
+def genModeleC (couleurs):
+    """Génère une chaine de caractère décrivant un cube particulier, mais non-résolut."""
+    (W,B,O,V,R,J) = couleurs
+    return ",".join([R+J+W+J+W+J+W+J+O,\
+                     V+B+B+B+B+W+V+R+V, J+O+R+B+O+O+W+O+R, B+V+V+V+V+W+B+O+B, J+R+O+V+R+R+W+R+O,\
+                                                                              O+W+J+B+J+V+J+W+R])
 
 class Cube:
-    # Valeurs de la classe Cube (inutiles)
     #W = "w" # 0 # Dessus [W-J Axe 0]
     #B = "b" # 1 # En face [B-V Axe 1]
     #O = "o" # 2 # A droite [O-R Axe 2]
     #V = "v" # 3 # Derrière
     #R = "r" # 4 # A gauche
     #J = "j" # 5 # Dessous
-    
-    modeleResolu = genModeleResolu([W,B,O,V,R,J])
-    modeleA = genModeleA([W,B,O,V,R,J])
-    
+        
     def __init__ (s, chaineU):
         
         ## Initialisation (pré-création) de valeurs temporaires:
@@ -33,13 +46,15 @@ class Cube:
         s.viAretes = [None]*12 # plus facilement ensuite, en utilisant les indices 'L[i]' uniquement.
         # vi-* : Ces listes contiendronts la version 'VIsuel' des sommets et des arrets. (deux ou trois facettes)
         
-        s.sommetsBloc = [None]*8
-        s.aretesBloc = [None]*12
-        # s.*sBloc: Ces listes donneront le numéro du bloc en fonction de numéro de position.
+        s.sommetsBlocALaPos = [None]*8 # Numero du bloc, en fonction de sa posistion.
+        s.sommetsRoALaPos = [None]*8   # Rotation du bloc trouvé à la position.
+        s.aretesBlocALaPos = [None]*12 #
+        s.aretesRoALaPos = [None]*12   #
         
-        s.sommetsPos = [None]*8
-        s.aretesPos = [None]*12
-        # s.*sPos: Ces listes donneront le numéro de position, en fonction du numéro de bloc.
+        s.sommetsPosDuBloc = [None]*8 # Position en fonction du numero de bloc.
+        s.sommetsRoDuBloc = [None]*8  # Rotation, en fonction du numero de bloc.
+        s.aretesPosDuBloc = [None]*12 # 
+        s.aretesRoDuBloc = [None]*12  # 
         # Fin de la pré-création #
         
         ## Définition de valeur propres au cube donné par l'utilisateur.
@@ -48,29 +63,41 @@ class Cube:
         s.couleurs = [ face[4] for face in s.faces ] # Le quatrième caractère est le centre de la face.
         (s.W, s.B, s.O, s.V, s.R, s.J) = s.couleurs # Nous affectons des noms spécifique à chaque couleur.
         (s.Wf, s.Bf, s.Of, s.Vf, s.Rf, s.Jf) = s.faces # Nous affectons aussi des nom à chaque face.
-        valeurParCouleurSommet = {s.W:0, s.B:0, s.O:0, s.J:1, s.V:2, s.R:4}
+        s.valeurParCouleurSommet = { s.W: 0,
+                                   s.J: 1,
+                                   s.B: 0,
+                                   s.V: 2,
+                                   s.O: 0,
+                                   s.R: 4}
         # [W-J:Axe 0: 1], [B-V:Axe 1: 2], [O-R:Axe 2: 4]
-        valeurParCouleurArete = {s.W:0,J:8,s.B:0,s.V:1,O:2,s.R:3}
+        s.valeurParCouleurArete = { s.W: 0, # Anneau du haut
+                                  s.J: 8, # Anneau du bas
+                                  s.B: 0, # \
+                                  s.O: 1, # . Parcours de l'anneau
+                                  s.V: 2, # . du milieu.
+                                  s.R: 3} # /
         
         s.couronneHaut = ''.join([ strg[0:3] for strg in s.faces[1:5]]) # On récupère les couronnes à différentes hauteurs
         s.couronneMil  = ''.join([ strg[3:6] for strg in s.faces[1:5]]) # Ceci facilitera l'identification ensuite.
         s.couronneBas  = ''.join([ strg[6:9] for strg in s.faces[1:5]])
-        Wf,Jf = s.Wf, s.Jf
         # Notion d'anneau (haut et bas) coresspond à une lecture particulière des faces :
         # 5 4 3
-        # 6 . 2 - Face du haut, numérotation de l'anneau
-        # 7 0 1
+        # 6 . 2 - Face du haut, numérotation de l'anneau,    # 0 1 2
+        # 7 0 1                 != Numérotation de la face : # 3 . 5
+        # . . .                                              # 6 7 8
         # . . .
-        # . . .
-        # . . .
-        # 7 0 1
-        # 6 . 2 - Face du bas, numérotation de l'anneu (aussi)
+        # . . .                                                # 2 5 8
+        # 7 0 1                 != Numérotation de la face :   # 1 . 7
+        # 6 . 2 - Face du bas, numérotation de l'anneu (aussi) # 0 3 6
         # 5 4 3
         # Code correspondant:
-        s.anneauHaut   = ''.join([Wf[7:9],Wf[5],Wf[3:0:-1],Wf[3],Wf[6]])
-        s.anneauBas    = ''.join([Jf[5],Jf[9:6:-1],Jf[3],Jf[0:3]])
-        s.modeleResolu = genModeleResolu(s.couleurs) # Nous intégrons deux modèles, pour les testes
+        Wf,Jf = s.Wf, s.Jf
+        s.anneauHaut   = ''.join([ Wf[7:9], Wf[5], Wf[0:3][::-1], Wf[3], Wf[6]])
+        s.anneauBas    = ''.join([ Jf[5], Jf[8:5:-1], Jf[3], Jf[0:3]])
+        s.modeleResolu = genModeleResolu(s.couleurs) # Nous intégrons trois modèles, pour les testes
         s.modeleA = genModeleA(s.couleurs) # ~
+        s.modeleB = genModeleB(s.couleurs) # ~
+        s.modeleC = genModeleC(s.couleurs) # ~
 
     
     def identifieSommet (s,bloc3f):
@@ -84,10 +111,10 @@ class Cube:
         if rotation == 3:
             return "Erreur de sommet dans la description du cube"
         # Calculons le numero (entre 0 et 7) du sommet:
-        num = sum([ valeurParCouleurSommet[x]  for x in bloc3f ])
+        num = sum([ s.valeurParCouleurSommet[x]  for x in bloc3f ])
         return (num,rotation)
 
-# Numérotation arbitraire des arètes:
+# Numérotation arbitraire des arêtes:
 # . 2 .                   
 # 3 W 1                   
 # . 0 .                   
@@ -102,9 +129,9 @@ class Cube:
         # bloc2f contient deux couleurs: deux facettes
         # Identifions le numero du bloc:
         num = 12
-        if s.W in bloc2f or s.J in bloc2f:
-            num = sum([ valeurParCouleurArete[x] for x in bloc2f ])
-        elif s.B in bloc2f:
+        if s.W in bloc2f or s.J in bloc2f: # Cas simple: l'arrète contient du blanc ou du jaune.
+            num = sum([ s.valeurParCouleurArete[x] for x in bloc2f ])
+        elif s.B in bloc2f: # Sinon, cas complexe: on se trouve sur l'anneau du milieu
             if s.O in bloc2f:
                 num = 4
             elif s.R in bloc2f:
@@ -125,13 +152,14 @@ class Cube:
             for i,x in enumerate(bloc2f):
                 if x == s.B or x == s.V:
                     rotation = i
-        if rotation == 2:
+        if rotation == 2: # Si la rotation n'est toujours pas déterminée, c'est qu'il y a une erreur.
             return "Erreur d'arête dans la description du cube"
         return (num,rotation)
 
 
 # Le regroupement des sommets et des aretes:
-#        THIS :           #        THIS :           
+# Pour les SOMMETS :      # Pour les ARRETES :
+#        CECI :           #        CECI :           
 # 0 . 2                   # . 1 .                   
 # . W .                   # 3 W 5                   
 # 6 . 8                   # . 7 .                   
@@ -141,7 +169,7 @@ class Cube:
 #                   0 . 2 #                   . 1 . 
 #                   . J . #                   3 J 5 
 #                   6 . 8 #                   . 7 . 
-#      SHALL BECOME :     #      SHALL BECOME :     
+#      DOIT DEVENIR :     #      DOIT DEVENIR :     
 # 6 . 2                   # . 2 .                   
 # . W .                   # 3 W 1                   
 # 4 . 0                   # . 0 .                   
@@ -155,17 +183,19 @@ class Cube:
 
     def groupSommets (s):
         """Regroupe les facettes des sommets par 2, selon leur numéro, en vue de leur identification"""
-        # On s'occupe des couches Haut et Bat en même temps. 
+        # On va remplire le tableau viSommets, avec les valeurs voulus.
+        # On s'occupe des couches Haut et Bas en même temps.
         for i,x in enumerate([0,1,3,2]): # Pour chaque sommet...
-            s.viSommets[2*i]   = (s.anneauHaut[2*x],
-                                 s.couronneHaut[(3*x+2)%12],
-                                 s.couronneHaut[3*(x+1)%12])
-            s.viSommets[2*i+1] = (s.anneauBas[2*x],
-                                 s.couronneBas[3*(x+1)%12],
-                                 s.couronneBas[(3*x+2)%12])
+            s.viSommets[2*i]   = (s.anneauHaut[2*x+1],
+                                 s.couronneHaut[(3*x+3)%12],
+                                 s.couronneHaut[(3*x+2)%12])
+            s.viSommets[2*i+1] = (s.anneauBas[2*x+1],
+                                 s.couronneBas[(3*x+2)%12],
+                                 s.couronneBas[(3*x+3)%12])
 
     def groupAretes (s):
         """Regroupe les facettes des arêtes par 2, selon leur numéro, en vue de leur identification"""
+        # On va remplire le tableau viAretes, avec les valeurs voulus.
         # Les quatres premières et quatre dernières arêtes de la liste peuvent s'identifier ainsi :
         for x in range(4):
             s.viAretes[x]   = (s.anneauHaut[2*x],s.couronneHaut[3*x+1])
@@ -180,14 +210,18 @@ class Cube:
         """Utilise la liste s.viSommet et la methode s.identifieSommet pour générer la double indexation position-bloc des sommets du cube. (Génère les listes s.sommetsBloc et s.sommetsPos)"""
         # Remarque: s.viSommets indexe les BLOCS trouvés, pour chaque POSITION
         for pos,sommet in enumerate(s.viSommets):
-            vu = identifieSommet(sommet)
-            s.sommetBloc[pos] = vu # A chaque position, on associe l'sommet correspondante
-            s.sommetPos[vu] = pos # A chaque sommet, on associe la position corespondante
+            (bloc_lu, rot) = s.identifieSommet(sommet)
+            s.sommetsBlocALaPos[pos] = bloc_lu # A chaque position, on associe l'sommet correspondante
+            s.sommetsRoALaPos[pos] = rot
+            s.sommetsPosDuBloc[bloc_lu] = pos # A chaque sommet, on associe la position corespondante
+            s.sommetsRoDuBloc[bloc_lu] = rot
         
     def mapAretes (s):
         """Utilise la liste s.viArete et la methode s.identifieArete pour générer la double indexation position-bloc des aretes du cube. (Génère les listes s.aretesBloc et s.aretesPos)"""
         # Remarque: s.viAretes indexe les BLOCS trouvés, pour chaque POSITION
-        for pos,arete in enumerate(s.viArete):
-            vu = identifieArete(arete)
-            s.areteBloc[pos] = vu # A chaque position, on associe l'arête correspondante
-            s.aretePos[vu] = pos # A chaque arête, on associe la position corespondante
+        for pos,arete in enumerate(s.viAretes):
+            (bloc_lu, rot) = s.identifieArete(arete)
+            s.aretesBlocALaPos[pos] = bloc_lu # A chaque position, on associe l'arête correspondante
+            s.aretesRoALaPos[pos] = rot
+            s.aretesPosDuBloc[bloc_lu] = pos # A chaque arête, on associe la position corespondante
+            s.aretesRoDuBloc[bloc_lu] = rot
