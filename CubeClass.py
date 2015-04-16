@@ -86,8 +86,8 @@ class Cube:
         # 7 0 1                 != Numérotation de la face : # 3 . 5
         # . . .                                              # 6 7 8
         # . . .
-        # . . .                                                # 2 5 8
-        # 7 0 1                 != Numérotation de la face :   # 1 . 7
+        # . . .                                                 # 2 5 8
+        # 7 0 1                  != Numérotation de la face :   # 1 . 7
         # 6 . 2 - Face du bas, numérotation de l'anneau (aussi) # 0 3 6
         # 5 4 3
         # Code correspondant:
@@ -99,9 +99,10 @@ class Cube:
         s.modeleB = genModeleB(s.couleurs) # ~
         s.modeleC = genModeleC(s.couleurs) # ~
         
+        # Tables de correspondance indiquant les positions dont les blocs vont bouger, ainsi que la nouvelle position associée.
         s.quarterSommet = [[(0,4),(4,6),(6,2),(2,0)],
                            [(0,1),(1,5),(5,4),(4,0)],
-                           [(0,2),(1,0),(3,1),(2,3)],
+                           [(0,2),(1,0),(3,1),(2,3)], #-# (Version mélangée, c'est plus fun!)
                            [(6,7),(7,3),(3,2),(2,6)],
                            [(4,5),(5,7),(7,6),(6,4)],
                            [(5,1),(1,3),(3,7),(7,5)]] # Les changements de position de type (oldPos,newPos) des Sommets
@@ -110,7 +111,22 @@ class Cube:
                           [(1,5),(4,1),(9,4),(5,9)],
                           [(2,6),(6,10),(10,5),(5,2)],
                           [(3,7),(7,11),(11,6),(6,3)],
-                          [(11,8),(8,9),(9,10),(10,11)]] # Les changements de position de type (oldPos,newPos) des Arêtes
+                          [(11,8),(8,9),(9,10),(10,11)]] # Les changements de position de type (oldPos,newPos) des Arête
+        # Version plus conscise :
+        s.cycleSommet = [[0,4,6,2,0], # Rotation de la face 0 : W : Blanche
+                         [0,1,5,4,0], # 1: B
+                         [1,0,2,3,1], # 2: O
+                         [6,7,3,2,6], # 3: V
+                         [4,5,7,6,4], # 4: R
+                         [5,1,3,7,5]] # 5: J
+        s.cycleArete = [[0,3,2,1,0], # Rotation de la face 0 : W : Blanche
+                        [0,4,8,7,0], # 1: B
+                        [1,4,9,5,9], # 2: O
+                        [2,6,10,5,2], # 3: V
+                        [3,7,11,6,3], # 4: R
+                        [11,8,9,10,11]] # 5: J
+        # End
+    
     
     def identifieSommet (s,bloc3f):
         """ Caractérise un sommet du cube, à partir de trois couleurs d'un bloc.""" 
