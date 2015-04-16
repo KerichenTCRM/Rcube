@@ -55,6 +55,9 @@ Avec les deux premières couronnes de faites:
 
         wwwwwwwww,bbbbbbjbr,oooooojrr,vvvvvvboo,rrrrrrjvv,bjojjjjjv
 
+## Sortie de l'algorithme
+La réponse, en sortie de l'algorithme, sera une liste de mouvements.
+
 ## Caractérisation pratique du cube
 Propositions de caratérisation du cube:
 * Par les facettes de chaque face
@@ -72,7 +75,7 @@ Propositions de caratérisation du cube:
 
         Inconvénient: manipulation du cube difficile
 
-    +En associant un bloc à chaque position, et une position à chaque bloc
+    +En associant un bloc à chaque position, et une position à chaque bloc [ Proposition retenue ]
 
         Avantage: observation et manipulation facile
         Inconvenient: maintient de deux descriptions du cube necessaire
@@ -80,14 +83,12 @@ Propositions de caratérisation du cube:
 ## Caractérisation pratique des mouvements
 
 Propositions de caratérisation des mouvements:
-* Par le centre de la face et le sens de rotation(horaire/anti-horaire):
+* Par le centre de la face et le sens de rotation(horaire/anti-horaire): [ Utilisé dans la réponse de l'algorithme à l'utilisateur ]
 
         Avantage: manipulation facile pour l'utilisateur
 
-* Par un des 12 mouvements et une référence (face devant et dessus):
+* Par un des 12 mouvements et une référence (face devant et dessus): [ Utilisé dans le code ]
         
         Avantage: similaire au langage utilisé lors de l'apprentissage de la résolution
         Inconvénient: nécessite une référence
 
-## Sortie de l'algorithme
-La réponse, en sortie de l'algorithme, sera une liste de mouvements.
