@@ -1,31 +1,31 @@
 #!/usr/bin/python3
 # Résolveur de Rubik's Cube
 
-# Génération de modèle, pour les testes de bon fonctionnement.
+# Génération de modèle, pour les tests de bon fonctionnement.
 def genCouleurs ():
     return ['w', 'b', 'o', 'v', 'r', 'j']
 
 def genModeleResolu (couleurs):
-    """Génère une chaine de caractère décrivant un cube résolut."""
+    """Génère une chaîne de caractère décrivant un cube résolu."""
     (W,B,O,V,R,J) = couleurs
     return ",".join([9*W,9*B,9*O,9*V,9*R,9*J])
 
 def genModeleA (couleurs):
-    """Génère une chaine de caractère décrivant un cube dont les deux premières couronnes sont résolut"""
+    """Génère une chaîne de caractères décrivant un cube dont les deux premières couronnes sont résolues"""
     (W,B,O,V,R,J) = couleurs
     return ",".join([9*W,\
     6*B+J+B+R, 6*O+J+R+R, 6*V+B+O+O, 6*R+J+V+V,\
     B+J+O+J+J+J+J+J+V])
     
 def genModeleB (couleurs):
-    """Génère une chaine de caractère décrivant un cube particulier, mais non-résolut."""
+    """Génère une chaîne de caractères décrivant un cube particulier, mais non résolu."""
     (W,B,O,V,R,J) = couleurs
     return ",".join([O+W+W+W+W+W+W+W+R,\
                      B+B+V+B+B+J+B+R+B, J+O+O+B+O+O+W+O+O, V+V+B+V+V+J+V+O+V, J+R+R+V+R+R+W+R+R,\
                                                                               R+J+J+B+J+V+J+J+O])
     
 def genModeleC (couleurs):
-    """Génère une chaine de caractère décrivant un cube particulier, mais non-résolut."""
+    """Génère une chaîne de caractères décrivant un cube particulier, mais non résolu."""
     (W,B,O,V,R,J) = couleurs
     return ",".join([R+J+W+J+W+J+W+J+O,\
                      V+B+B+B+B+W+V+R+V, J+O+R+B+O+O+W+O+R, B+V+V+V+V+W+B+O+B, J+R+O+V+R+R+W+R+O,\
@@ -44,15 +44,15 @@ class Cube:
         ## Initialisation (pré-création) de valeurs temporaires:
         s.viSommets = [None]*8 # Nous pré-créons ces huit valeur, pour pouvoir les affecter
         s.viAretes = [None]*12 # plus facilement ensuite, en utilisant les indices 'L[i]' uniquement.
-        # vi-* : Ces listes contiendronts la version 'VIsuel' des sommets et des arrets. (deux ou trois facettes)
+        # vi-* : Ces listes contiendronts la version 'VIsuel' des sommets et des arêtes. (deux ou trois facettes)
         
-        s.sommetsBlocALaPos = [None]*8 # Numero du bloc, en fonction de sa posistion.
+        s.sommetsBlocALaPos = [None]*8 # Numéro du bloc, en fonction de sa position.
         s.sommetsRoALaPos = [None]*8   # Rotation du bloc trouvé à la position.
         s.aretesBlocALaPos = [None]*12 #
         s.aretesRoALaPos = [None]*12   #
         
-        s.sommetsPosDuBloc = [None]*8 # Position en fonction du numero de bloc.
-        s.sommetsRoDuBloc = [None]*8  # Rotation, en fonction du numero de bloc.
+        s.sommetsPosDuBloc = [None]*8 # Position en fonction du numéro de bloc.
+        s.sommetsRoDuBloc = [None]*8  # Rotation, en fonction du numéro de bloc.
         s.aretesPosDuBloc = [None]*12 # 
         s.aretesRoDuBloc = [None]*12  # 
         # Fin de la pré-création #
@@ -62,7 +62,7 @@ class Cube:
         # La facette n°4 (le centre) définit la couleur de la face :
         s.couleurs = [ face[4] for face in s.faces ] # Le quatrième caractère est le centre de la face.
         (s.W, s.B, s.O, s.V, s.R, s.J) = s.couleurs # Nous affectons des noms spécifique à chaque couleur.
-        (s.Wf, s.Bf, s.Of, s.Vf, s.Rf, s.Jf) = s.faces # Nous affectons aussi des nom à chaque face.
+        (s.Wf, s.Bf, s.Of, s.Vf, s.Rf, s.Jf) = s.faces # Nous affectons aussi des noms à chaque face.
         s.valeurParCouleurSommet = { s.W: 0,
                                    s.J: 1,
                                    s.B: 0,
@@ -80,7 +80,7 @@ class Cube:
         s.couronneHaut = ''.join([ strg[0:3] for strg in s.faces[1:5]]) # On récupère les couronnes à différentes hauteurs
         s.couronneMil  = ''.join([ strg[3:6] for strg in s.faces[1:5]]) # Ceci facilitera l'identification ensuite.
         s.couronneBas  = ''.join([ strg[6:9] for strg in s.faces[1:5]])
-        # Notion d'anneau (haut et bas) coresspond à une lecture particulière des faces :
+        # Notion d'anneau (haut et bas) correspond à une lecture particulière des faces :
         # 5 4 3
         # 6 . 2 - Face du haut, numérotation de l'anneau,    # 0 1 2
         # 7 0 1                 != Numérotation de la face : # 3 . 5
@@ -88,13 +88,13 @@ class Cube:
         # . . .
         # . . .                                                # 2 5 8
         # 7 0 1                 != Numérotation de la face :   # 1 . 7
-        # 6 . 2 - Face du bas, numérotation de l'anneu (aussi) # 0 3 6
+        # 6 . 2 - Face du bas, numérotation de l'anneau (aussi) # 0 3 6
         # 5 4 3
         # Code correspondant:
         Wf,Jf = s.Wf, s.Jf
         s.anneauHaut   = ''.join([ Wf[7:9], Wf[5], Wf[0:3][::-1], Wf[3], Wf[6]])
         s.anneauBas    = ''.join([ Jf[5], Jf[8:5:-1], Jf[3], Jf[0:3]])
-        s.modeleResolu = genModeleResolu(s.couleurs) # Nous intégrons trois modèles, pour les testes
+        s.modeleResolu = genModeleResolu(s.couleurs) # Nous intégrons trois modèles, pour les tests
         s.modeleA = genModeleA(s.couleurs) # ~
         s.modeleB = genModeleB(s.couleurs) # ~
         s.modeleC = genModeleC(s.couleurs) # ~
@@ -110,7 +110,7 @@ class Cube:
                           [(1,5),(4,1),(9,4),(5,9)],
                           [(2,6),(6,10),(10,5),(5,2)],
                           [(3,7),(7,11),(11,6),(6,3)],
-                          [(11,8),(8,9),(9,10),(10,11)]] # Les changements de position de type (oldPos,newPos) des Aretes
+                          [(11,8),(8,9),(9,10),(10,11)]] # Les changements de position de type (oldPos,newPos) des Arêtes
     
     def identifieSommet (s,bloc3f):
         """ Caractérise un sommet du cube, à partir de trois couleurs d'un bloc.""" 
@@ -169,8 +169,8 @@ class Cube:
         return (num,rotation)
 
 
-# Le regroupement des sommets et des aretes:
-# Pour les SOMMETS :      # Pour les ARRETES :
+# Le regroupement des sommets et des arêtes:
+# Pour les SOMMETS :      # Pour les ARÊTES :
 #        CECI :           #        CECI :           
 # 0 . 2                   # . 1 .                   
 # . W .                   # 3 W 5                   
@@ -195,7 +195,7 @@ class Cube:
 
     def groupSommets (s):
         """Regroupe les facettes des sommets par 2, selon leur numéro, en vue de leur identification"""
-        # On va remplire le tableau viSommets, avec les valeurs voulus.
+        # On va remplir le tableau viSommets, avec les valeurs voulues.
         # On s'occupe des couches Haut et Bas en même temps.
         for i,x in enumerate([0,1,3,2]): # Pour chaque sommet...
             s.viSommets[2*i]   = (s.anneauHaut[2*x+1],
@@ -207,7 +207,7 @@ class Cube:
 
     def groupAretes (s):
         """Regroupe les facettes des arêtes par 2, selon leur numéro, en vue de leur identification"""
-        # On va remplire le tableau viAretes, avec les valeurs voulus.
+        # On va remplir le tableau viArêtes, avec les valeurs voulues.
         # Les quatres premières et quatre dernières arêtes de la liste peuvent s'identifier ainsi :
         for x in range(4):
             s.viAretes[x]   = (s.anneauHaut[2*x],s.couronneHaut[3*x+1])
@@ -223,7 +223,7 @@ class Cube:
         # Remarque: s.viSommets indexe les BLOCS trouvés, pour chaque POSITION
         for pos,sommet in enumerate(s.viSommets):
             (bloc_lu, rot) = s.identifieSommet(sommet)
-            s.sommetsBlocALaPos[pos] = bloc_lu # A chaque position, on associe l'sommet correspondante
+            s.sommetsBlocALaPos[pos] = bloc_lu # A chaque position, on associe le sommet correspondant
             s.sommetsRoALaPos[pos] = rot
             s.sommetsPosDuBloc[bloc_lu] = pos # A chaque sommet, on associe la position corespondante
             s.sommetsRoDuBloc[bloc_lu] = rot
