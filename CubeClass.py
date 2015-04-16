@@ -98,10 +98,22 @@ class Cube:
         s.modeleA = genModeleA(s.couleurs) # ~
         s.modeleB = genModeleB(s.couleurs) # ~
         s.modeleC = genModeleC(s.couleurs) # ~
-
+        
+        s.quarterSommet = [[(0,4),(4,6),(6,2),(2,0)],
+                           [(0,1),(1,5),(5,4),(4,0)],
+                           [(0,2),(1,0),(3,1),(2,3)],
+                           [(6,7),(7,3),(3,2),(2,6)],
+                           [(4,5),(5,7),(7,6),(6,4)],
+                           [(5,1),(1,3),(3,7),(7,5)]] # Les changements de position de type (oldPos,newPos) des Sommets
+        s.quarterArete = [[(0,3),(3,2),(2,1),(1,0)],
+                          [(0,4),(4,8),(8,7),(7,0)],
+                          [(1,5),(4,1),(9,4),(5,9)],
+                          [(2,6),(6,10),(10,5),(5,2)],
+                          [(3,7),(7,11),(11,6),(6,3)],
+                          [(11,8),(8,9),(9,10),(10,11)]] # Les changements de position de type (oldPos,newPos) des Aretes
     
     def identifieSommet (s,bloc3f):
-        """ Caractérise un sommet du cube, à partir de trois couleurs d'un bloc."""
+        """ Caractérise un sommet du cube, à partir de trois couleurs d'un bloc.""" 
         # bloc3f contient trois couleurs: trois facettes
         # Identifions la rotation du sommet:
         rotation = 3
