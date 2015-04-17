@@ -322,7 +322,7 @@ class Cube:
         s.rotationSommets(fNum,nbQuarts)
         s.rotationAretes(fNum,nbQuarts)
         
-    def move (numeroFace,nombreDeQuartsDeTour): # Finalement, il semble plus simple de n'utiliser que le numero des faces.
+    def move (s,numeroFace,nombreDeQuartsDeTour): # Finalement, il semble plus simple de n'utiliser que le numero des faces.
         couleurFace = s.couleur[numeroFace]
         if nombreDeQuartDeTour % 4 == 1:
             action = "+"
