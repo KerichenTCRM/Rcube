@@ -320,3 +320,54 @@ class Cube:
         fNum = s.numeroDeCouleur[face]
         s.rotationSommets(fNum,nbQuarts)
         s.rotationAretes(fNum,nbQuarts)
+        
+    def croixW(s):
+        """ Effectue une succession de mouvements établissant une croix de blocs bien placés sur la face s.W (Etape 1) """
+        
+        for k in range(4):
+            arete = [0,1,2,3][k] # Les 4 blocs à déplacer.
+            
+            (currentPos,currentDeg) = (s.aretesPosDuBloc[arete],s.aretesRoDuBloc[arete])
+            
+            if not(currentPos == arete and currentDeg == 0): # Est-il mal placé ?
+            
+                if currentPos in (0,1,2,3): # Cas face supérieure
+                    move([s.B,s.O,s.V,s.R][currentPos],2)
+                elif currentPos in (4,5,6,7): # Cas 2ème couronne
+                    c = (k+4-currentPos)
+                    move(s.W,c)
+                    move([s.B,s.O,s.V,s.R][arete-c%4],1)
+                    move(s.W,-c) # Toujours réorienter la face supérieure !
+                
+                # On se ramène au cas inférieur :
+                (currentPos,currentDeg) = (s.aretesPosDuBloc[arete],s.aretesRoDuBloc[arete])
+                
+                move(s.J,(k+8-currentPos)%4)
+                
+                # 2 cas sont possibles:
+                if currentDeg == 0:
+                    move([s.B,s.O,s.V,s.R][arete],2)   # -> combinaison
+                else:
+                    move([s.B,s.O,s.V,s.R][arete],1)   # -> combinaison
+                    move(s.W,1)                        # -> -----------
+                    move([s.B,s.O,s.V,s.R][arete-1],3) # -> -----------
+                    move(s.W,3)                        # -> ----------- # Toujours réorienter la face supérieure !
+    
+    def coinsDegJ(s):
+        """ Effectue une succession de mouvements établissant une rotation des derniers blocs mal orientés sur la face s.J (Etape 7) """
+        for k in range(3):
+            sommet = [1,3,5][k]
+            
+            currentDeg = s.sommetsPosDuBloc[sommet]
+            
+            while not(currentDeg == 0):
+                for i in range(2): # Partie 1 face de gauche (k+1), Partie 2 face de droite (k-1)
+                    move([s.B,s.O,s.V,s.R][[k+1,k-1][i]],[3,1][i]) # -> combinaison partie (i+1)/2
+                    move(s.J,2)                                    # -> ----------- ------ -------
+                    move([s.B,s.O,s.V,s.R][[k+1,k-1][i]],[1,3][i]) # -> ----------- ------ -------
+                    move(s.J,[1,3][i])                             # -> ----------- ------ -------
+                    move([s.B,s.O,s.V,s.R][[k+1,k-1][i]],[3,1][i]) # -> ----------- ------ -------
+                    move(s.J,[1,3][i])                             # -> ----------- ------ -------
+                    move([s.B,s.O,s.V,s.R][[k+1,k-1][i]],[1,3][i]) # -> ----------- ------ -------
+                
+                currentDeg = s.sommetsPosDuBloc[sommet]
