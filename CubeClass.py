@@ -415,7 +415,7 @@ class Cube:
         for k in range(3):
             sommet = [1,3,5][k]
             
-            currentDeg = s.sommetsPosDuBloc[sommet]
+            currentDeg = s.sommetsRoDuBloc[sommet]
             
             while not(currentDeg == 0):
                 for i in range(2): # Partie 1 face de gauche (k+1), Partie 2 face de droite (k-1)
@@ -427,7 +427,7 @@ class Cube:
                     s.move(5,[1,3][i])                    # -> ----------- ------ -------
                     s.move(s.BOVR[[k+1,k-1][i]],[1,3][i]) # -> ----------- ------ -------
                 
-                currentDeg = s.sommetsPosDuBloc[sommet]
+                currentDeg = s.sommetsRoDuBloc[sommet]
 
     def Belge(s):
         """ Effectue une succession de mouvements établissant la deuxième couronne (Etape 3) """
