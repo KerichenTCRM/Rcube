@@ -57,6 +57,9 @@ class Cube:
         s.aretesRoDuBloc = [None]*12  # 
         # Fin de la pré-création #
         
+        #Initialilisation de la liste des mouvements celle que renverra l'algorithme:
+        s.listDesMouvements = ""
+        
         ## Définition de valeur propres au cube donné par l'utilisateur.
         s.faces = chaineU.split(',')
         # La facette n°4 (le centre) définit la couleur de la face :
@@ -316,11 +319,24 @@ class Cube:
             s.aretesRoDuBloc[bloc] = ro
             s.aretesRoALaPos[pos] = ro
      
-    def rotationFace (s,face,nbQuarts):
-        fNum = s.numeroDeCouleur[face]
+    def rotationFace (s,fNum,nbQuarts):
         s.rotationSommets(fNum,nbQuarts)
         s.rotationAretes(fNum,nbQuarts)
         
+    def move (numeroFace,nombreDeQuartsDeTour): # Finalement, il semble plus simple de n'utiliser que le numero des faces.
+        couleurFace = s.couleur[numeroFace]
+        if nombreDeQuartDeTour % 4 == 1:
+            action = "+"
+        elif nombreDeQuartDeTour % 4 == 3:
+            action = "-"
+        elif nombreDeQuartDeTour % 4 == 2:
+            action = "²"
+        else: # nombreDeQuartDeTour % 4 == 0
+            action = ''
+            couleurFace = ''
+        s.listDesMouvements += couleurFace + action
+        rotationFace(numeroFace,nombreDeQuartsDeTour)
+
     def croixW(s):
         """ Effectue une succession de mouvements établissant une croix de blocs bien placés sur la face s.W (Etape 1) """
         
