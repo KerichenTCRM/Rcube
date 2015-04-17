@@ -31,6 +31,20 @@ def genModeleC (couleurs):
                      V+B+B+B+B+W+V+R+V, J+O+R+B+O+O+W+O+R, B+V+V+V+V+W+B+O+B, J+R+O+V+R+R+W+R+O,\
                                                                               O+W+J+B+J+V+J+W+R])
 
+def genModeleEtape1 (couleurs): # Complètement mélangé
+    """Génère une chaîne de caractères décrivant un cube juste avant l'étape 1"""
+    (W,B,O,V,R,J) = couleurs
+    return ",".join([J+R+V+W+W+O+W+B+J,\
+                     O+W+B+J+B+W+R+V+W, R+B+J+R+O+V+V+R+V, R+B+O+J+V+J+J+V+W, B+O+B+O+R+B+R+O+B,\
+                                                                              V+V+W+W+J+R+O+J+O])
+
+def genModeleEtape7 (couleurs):
+    """Génère une chaîne de caractères décrivant un cube juste avant l'étape 7"""
+    (W,B,O,V,R,J) = couleurs
+    return ",".join([W+W+W+W+W+W+W+W+W,\
+                     B+B+B+B+B+B+R+B+O, O+O+O+O+O+O+J+O+O, V+V+V+V+V+V+V+V+V, R+R+R+R+R+R+R+R+J,\
+                                                                              J+J+B+J+J+J+J+J+B])
+
 class Cube:
     #W = "w" # 0 # Dessus [W-J Axe 0]
     #B = "b" # 1 # En face [B-V Axe 1]
@@ -349,20 +363,20 @@ class Cube:
         s.rotationSommets(fNum,nbQuarts)
         s.rotationAretes(fNum,nbQuarts)
         
-    def move (s,numeroFace,nombreDeQuartsDeTour): # Finalement, il semble plus simple de n'utiliser que le numero des faces.
+    def move (s,fNum,nbQuarts): # Finalement, il semble plus simple de n'utiliser que le numero des faces.
         """ Opère la rotation d'une des face du cube """
-        couleurFace = s.couleurs[numeroFace]
-        if nombreDeQuartsDeTour % 4 == 1:
+        couleurFace = s.couleurs[fNum]
+        if nbQuarts % 4 == 1:
             action = "+"
-        elif nombreDeQuartsDeTour % 4 == 3:
+        elif nbQuarts % 4 == 3:
             action = "-"
-        elif nombreDeQuartsDeTour % 4 == 2:
+        elif nbQuarts % 4 == 2:
             action = "²"
-        else: # nombreDeQuartsDeTour % 4 == 0
+        else: # nbQuarts % 4 == 0
             action = ''
             couleurFace = ''
         s.listeDesMouvements += couleurFace + action
-        s.rotationFace(numeroFace,nombreDeQuartsDeTour)
+        s.rotationFace(fNum,nbQuarts)
         
     def croixW(s):
         """ Effectue une succession de mouvements établissant une croix de blocs bien placés sur la face s.W (Etape 1) """
@@ -375,26 +389,26 @@ class Cube:
             if not(currentPos == arete and currentDeg == 0): # Est-il mal placé ?
             
                 if currentPos in (0,1,2,3): # Cas face supérieure
-                    move(s.BOVR[currentPos],2)
+                    s.move(s.BOVR[currentPos],2)
                 elif currentPos in (4,5,6,7): # Cas 2ème couronne
                     c = (k+4-currentPos)
-                    move(s.W,c)
-                    move(s.BOVR[arete-c%4],1)
-                    move(s.W,-c) # Toujours réorienter la face supérieure !
+                    s.move(0,c)
+                    s.move(s.BOVR[arete-c%4],1)
+                    s.move(0,-c) # Toujours réorienter la face supérieure !
                 
                 # On se ramène au cas inférieur :
                 (currentPos,currentDeg) = (s.aretesPosDuBloc[arete],s.aretesRoDuBloc[arete])
                 
-                move(s.J,(k+8-currentPos)%4)
+                s.move(5,(k+8-currentPos)%4)
                 
                 # 2 cas sont possibles:
                 if currentDeg == 0:
-                    move(s.BOVR[arete],2)   # -> combinaison
+                    s.move(s.BOVR[arete],2)   # -> combinaison
                 else:
-                    move(s.BOVR[arete],1)   # -> combinaison
-                    move(s.W,1)                        # -> -----------
-                    move(s.BOVR[arete-1],3) # -> -----------
-                    move(s.W,3)                        # -> ----------- # Toujours réorienter la face supérieure !
+                    s.move(s.BOVR[arete],1)   # -> combinaison
+                    s.move(0,1)               # -> -----------
+                    s.move(s.BOVR[arete-1],3) # -> -----------
+                    s.move(0,3)               # -> ----------- # Toujours réorienter la face supérieure !
     
     def coinsDegJ(s):
         """ Effectue une succession de mouvements établissant une rotation des derniers blocs mal orientés sur la face s.J (Etape 7) """
@@ -405,17 +419,16 @@ class Cube:
             
             while not(currentDeg == 0):
                 for i in range(2): # Partie 1 face de gauche (k+1), Partie 2 face de droite (k-1)
-                    move(s.BOVR[[k+1,k-1][i]],[3,1][i]) # -> combinaison partie (i+1)/2
-                    move(s.J,2)                                    # -> ----------- ------ -------
-                    move(s.BOVR[[k+1,k-1][i]],[1,3][i]) # -> ----------- ------ -------
-                    move(s.J,[1,3][i])                             # -> ----------- ------ -------
-                    move(s.BOVR[[k+1,k-1][i]],[3,1][i]) # -> ----------- ------ -------
-                    move(s.J,[1,3][i])                             # -> ----------- ------ -------
-                    move(s.BOVR[[k+1,k-1][i]],[1,3][i]) # -> ----------- ------ -------
+                    s.move(s.BOVR[[k+1,k-1][i]],[3,1][i]) # -> combinaison partie (i+1)/2
+                    s.move(5,2)                           # -> ----------- ------ -------
+                    s.move(s.BOVR[[k+1,k-1][i]],[1,3][i]) # -> ----------- ------ -------
+                    s.move(5,[1,3][i])                    # -> ----------- ------ -------
+                    s.move(s.BOVR[[k+1,k-1][i]],[3,1][i]) # -> ----------- ------ -------
+                    s.move(5,[1,3][i])                    # -> ----------- ------ -------
+                    s.move(s.BOVR[[k+1,k-1][i]],[1,3][i]) # -> ----------- ------ -------
                 
                 currentDeg = s.sommetsPosDuBloc[sommet]
-                
-                
+
     def Belge(s):
         """ Effectue une succession de mouvements établissant la deuxième couronne (Etape 3) """
         
@@ -460,5 +473,3 @@ class Cube:
                     move(s.OVRB[currentPos%4],3)
                     move(s.J,1)
                     move(s.OVRB[currentPos%4],1)
-                
-                 
