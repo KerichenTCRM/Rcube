@@ -293,7 +293,7 @@ class Cube:
     def diffRoSommets (s,fNum,nbQuarts,oldPos):
         """Calcule l'écart de degrée d'un sommet à la position old_Pos entre avant et après une rotation de la face de numéro fNum, de nbQuarts quarts de tours. """
         if fNum != 0 and fNum != 5 and (nbQuarts % 2 != 0) :
-            return 1 + ( fNum + s.sommetsPosParitee[oldPos] + (nbQuarts-1)//2 ) % 2
+            return 1 + ( fNum + s.sommetsPosParitee[oldPos] ) % 2
         else:
             return 0
         
