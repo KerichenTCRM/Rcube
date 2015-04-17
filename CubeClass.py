@@ -382,7 +382,7 @@ class Cube:
             (currentPos,currentDeg) = (s.aretesPosDuBloc[arete],s.aretesRoDuBloc[arete])
             
             if not(currentPos == arete and currentDeg == 0):# Est-il mal placé ?
-                 if currentPos in (4,5,6,7):
+                if currentPos in (4,5,6,7):
                     move([s.B,s.O,s.V,s.R][currentPos%4],1)
                     move(s.J,3)
                     move([s.B,s.O,s.V,s.R][currentPos%4],3)
@@ -391,8 +391,7 @@ class Cube:
                     move(s.J,1)
                     move([s.O,s.V,s.R,s.B][currentPos%4],1)
                     #L'arête est désormais sur la face jaune
-                    
-                (currentPos,currentDeg) = (s.aretesPosDuBloc[arete],s.aretesRoDuBloc[arete])
+                    (currentPos,currentDeg) = (s.aretesPosDuBloc[arete],s.aretesRoDuBloc[arete])
                     
                 while (currentPos!=[8,9,10,11][k] and RoDuBloc[arete]==0) or (currentPos!=[9,10,11,8][k] and RoDuBloc[arete]==1):
                     move(s.J,1)
