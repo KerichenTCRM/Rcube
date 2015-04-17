@@ -157,6 +157,7 @@ class Cube:
         # Fin de __init__
         
     def decrireCube (s):
+        """Renvoie l'état du cube"""
         return "\n".join([
         "s.sommetsBlocALaPos = {}".format(s.sommetsBlocALaPos),
         "s.sommetsRoALaPos = {}".format(s.sommetsRoALaPos),
@@ -171,6 +172,7 @@ class Cube:
         ])
     
     def printCube (s):
+        """Affiche l'état du cube"""
         print( s.decrireCube() )
     
     
@@ -289,12 +291,14 @@ class Cube:
             s.aretesRoDuBloc[bloc_lu] = rot
      
     def diffRoSommets (s,fNum,nbQuarts,oldPos):
+        """Calcule l'écart de degrée d'un sommet à la position old_Pos entre avant et après une rotation de la face de numéro fNum, de nbQuarts quarts de tours. """
         if fNum != 0 and fNum != 5 and (nbQuarts % 2 != 0) :
             return 1 + ( fNum + s.sommetsPosParitee[oldPos] + (nbQuarts-1)//2 ) % 2
         else:
             return 0
         
     def rotationSommets (s,fNum,nbQuarts):
+        """Applique aux sommets du cube les changements que causent une rotation de la face de numéro fNum, de nbQuarts quarts de tours. """
         # On gère en même temps la position et la rotation
         # On établit d'abord une liste temporaire, indiquant un bloc, sa nouvelle position, et sa nouvelle rotation.
         nbQuarts %= 4 # donc nbQuarts = 1,2 ou 3
@@ -315,9 +319,11 @@ class Cube:
             s.sommetsRoALaPos[pos] = ro
         
     def diffRoAretes (s,fNum,nbQuarts):
+        """ Indique, pour la rotation d'une face, si les arêtes subissent un changement de degré. """
         return (nbQuarts % 2) * (fNum == 1 or fNum == 3)
         
     def rotationAretes (s,fNum,nbQuarts):
+        """Applique aux arêtes du cube les changements que causent une rotation de la face de numéro fNum, de nbQuarts quarts de tours. """
         # On gère en même temps la position et la rotation
         # On établit d'abord une liste temporaire, indiquant un bloc, sa nouvelle position, et sa nouvelle rotation.
         nbQuarts %= 4 # donc nbQuarts = 1,2 ou 3
@@ -339,10 +345,12 @@ class Cube:
             s.aretesRoALaPos[pos] = ro
      
     def rotationFace (s,fNum,nbQuarts):
+        """ Applique aux blocs du cube les changements que causent une rotation de la face de numéro fNum, de nbQuarts quarts de tours. """
         s.rotationSommets(fNum,nbQuarts)
         s.rotationAretes(fNum,nbQuarts)
         
     def move (s,numeroFace,nombreDeQuartsDeTour): # Finalement, il semble plus simple de n'utiliser que le numero des faces.
+        """ Opère la rotation d'une des face du cube """
         couleurFace = s.couleurs[numeroFace]
         if nombreDeQuartsDeTour % 4 == 1:
             action = "+"
