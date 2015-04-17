@@ -96,14 +96,12 @@ Propositions de caratérisation des mouvements:
 * Fonction de rotation, opérant avec la couleur du centre à tourner, et le nombre de quart de tour à effectuer.
      + Tableau, spécifiant pour chaque quart de tour d'une face, les positions dont les blocs sont déplacés, et la nouvelle position associée. (Un tableau pour les arêtes, et un pour les sommets) [Rémy]
      + Fonction déterminant l'orientation des blocs, après la rotation de la face. [Mathieu]
-* Modèle abstrait, permettant "choisir" une des quatres faces du cube comme face de travail, on identifie alors les faces t: de travail, d: droite, g: gauche, et o: opposée. [Mathieu]
+* [Ne sera peut-être pas fait] Modèle abstrait, permettant "choisir" une des quatres faces du cube comme face de travail, on identifie alors les faces: { t: de travail, d: droite, g: gauche, et o: opposée }. [Mathieu]
 
 #### Manipulation du cube:
 * Première face et première couronne:
      + La croix blanche [Rémy]
-
      + Les sommets [Cyril]
-    
 * Deuxième couronne [Tanguy]
 * Troisième face et troisième couronne:
      + L'orientation des arètes: petite croix jaune [Cyril]
