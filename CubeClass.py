@@ -71,6 +71,8 @@ class Cube:
                                    s.O: 0,
                                    s.R: 4}
         s.sommetsPosParitee = [0,1,1,0,1,0,0,1]
+        s.BOVR = [1,2,3,4]
+        s.OVRB = [2,3,4,1]
         # [W-J:Axe 0: 1], [B-V:Axe 1: 2], [O-R:Axe 2: 4]
         
 # Numérotation arbitraire des arêtes:
@@ -345,11 +347,11 @@ class Cube:
             if not(currentPos == arete and currentDeg == 0): # Est-il mal placé ?
             
                 if currentPos in (0,1,2,3): # Cas face supérieure
-                    move([s.B,s.O,s.V,s.R][currentPos],2)
+                    move(s.BOVR[currentPos],2)
                 elif currentPos in (4,5,6,7): # Cas 2ème couronne
                     c = (k+4-currentPos)
                     move(s.W,c)
-                    move([s.B,s.O,s.V,s.R][arete-c%4],1)
+                    move(s.BOVR[arete-c%4],1)
                     move(s.W,-c) # Toujours réorienter la face supérieure !
                 
                 # On se ramène au cas inférieur :
@@ -359,11 +361,11 @@ class Cube:
                 
                 # 2 cas sont possibles:
                 if currentDeg == 0:
-                    move([s.B,s.O,s.V,s.R][arete],2)   # -> combinaison
+                    move(s.BOVR[arete],2)   # -> combinaison
                 else:
-                    move([s.B,s.O,s.V,s.R][arete],1)   # -> combinaison
+                    move(s.BOVR[arete],1)   # -> combinaison
                     move(s.W,1)                        # -> -----------
-                    move([s.B,s.O,s.V,s.R][arete-1],3) # -> -----------
+                    move(s.BOVR[arete-1],3) # -> -----------
                     move(s.W,3)                        # -> ----------- # Toujours réorienter la face supérieure !
     
     def coinsDegJ(s):
@@ -375,13 +377,13 @@ class Cube:
             
             while not(currentDeg == 0):
                 for i in range(2): # Partie 1 face de gauche (k+1), Partie 2 face de droite (k-1)
-                    move([s.B,s.O,s.V,s.R][[k+1,k-1][i]],[3,1][i]) # -> combinaison partie (i+1)/2
+                    move(s.BOVR[[k+1,k-1][i]],[3,1][i]) # -> combinaison partie (i+1)/2
                     move(s.J,2)                                    # -> ----------- ------ -------
-                    move([s.B,s.O,s.V,s.R][[k+1,k-1][i]],[1,3][i]) # -> ----------- ------ -------
+                    move(s.BOVR[[k+1,k-1][i]],[1,3][i]) # -> ----------- ------ -------
                     move(s.J,[1,3][i])                             # -> ----------- ------ -------
-                    move([s.B,s.O,s.V,s.R][[k+1,k-1][i]],[3,1][i]) # -> ----------- ------ -------
+                    move(s.BOVR[[k+1,k-1][i]],[3,1][i]) # -> ----------- ------ -------
                     move(s.J,[1,3][i])                             # -> ----------- ------ -------
-                    move([s.B,s.O,s.V,s.R][[k+1,k-1][i]],[1,3][i]) # -> ----------- ------ -------
+                    move(s.BOVR[[k+1,k-1][i]],[1,3][i]) # -> ----------- ------ -------
                 
                 currentDeg = s.sommetsPosDuBloc[sommet]
                 
@@ -396,13 +398,13 @@ class Cube:
             
             if not(currentPos == arete and currentDeg == 0):# Est-il mal placé ?
                 if currentPos in (4,5,6,7):
-                    move([s.B,s.O,s.V,s.R][currentPos%4],1)
+                    move(s.BOVR[currentPos%4],1)
                     move(s.J,3)
-                    move([s.B,s.O,s.V,s.R][currentPos%4],3)
+                    move(s.BOVR[currentPos%4],3)
                     move(s.J,3)
-                    move([s.O,s.V,s.R,s.B][currentPos%4],3)
+                    move(s.OVRB[currentPos%4],3)
                     move(s.J,1)
-                    move([s.O,s.V,s.R,s.B][currentPos%4],1)
+                    move(s.OVRB[currentPos%4],1)
                     #L'arête est désormais sur la face jaune
                     (currentPos,currentDeg) = (s.aretesPosDuBloc[arete],s.aretesRoDuBloc[arete])
                     
@@ -414,21 +416,21 @@ class Cube:
                     #Doit-on faire le belge à doite ou à gauche?
                 if (currentPos-arete)%2:    #à droite
                     move(s.J,3)
-                    move([s.O,s.V,s.R,s.B][currentPos%4],3)
+                    move(s.OVRB[currentPos%4],3)
                     move(s.J,1)
-                    move([s.O,s.V,s.R,s.B][currentPos%4],1)
+                    move(s.OVRB[currentPos%4],1)
                     move(s.J,1)
-                    move([s.B,s.O,s.V,s.R][currentPos%4],1)
+                    move(s.BOVR[currentPos%4],1)
                     move(s.J,3)
-                    move([s.B,s.O,s.V,s.R][currentPos%4],3)
+                    move(s.BOVR[currentPos%4],3)
                 else:                       # à gauche
                     move(s.J,1)
-                    move([s.B,s.O,s.V,s.R][currentPos%4],1)
+                    move(s.BOVR[currentPos%4],1)
                     move(s.J,3)
-                    move([s.B,s.O,s.V,s.R][currentPos%4],3)
+                    move(s.BOVR[currentPos%4],3)
                     move(s.J,3)
-                    move([s.O,s.V,s.R,s.B][currentPos%4],3)
+                    move(s.OVRB[currentPos%4],3)
                     move(s.J,1)
-                    move([s.O,s.V,s.R,s.B][currentPos%4],1)
+                    move(s.OVRB[currentPos%4],1)
                 
                  
