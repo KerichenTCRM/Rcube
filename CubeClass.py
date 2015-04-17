@@ -55,7 +55,7 @@ class Cube:
         
     def __init__ (s, chaineU):
         
-        ## Initialisation (pré-création) de valeurs temporaires:
+        ### Initialisation (pré-création) de valeurs temporaires:
         s.viSommets = [None]*8 # Nous pré-créons ces huit valeur, pour pouvoir les affecter
         s.viAretes = [None]*12 # plus facilement ensuite, en utilisant les indices 'L[i]' uniquement.
         # vi-* : Ces listes contiendronts la version 'VIsuel' des sommets et des arêtes. (deux ou trois facettes)
@@ -71,26 +71,14 @@ class Cube:
         s.aretesRoDuBloc = [None]*12  # 
         # Fin de la pré-création #
 
-        # Initialilisation de la liste des mouvements : celle que renverra l'algorithme:
+        ### Initialilisation de la liste des mouvements : celle que renverra l'algorithme:
         s.listeDesMouvements = ""
-        
-        ## Définition de valeur propres au cube donné par l'utilisateur.
-        s.faces = chaineU.split(',')
-        # La facette n°4 (le centre) définit la couleur de la face :
-        s.couleurs = [ face[4] for face in s.faces ] # Le quatrième caractère est le centre de la face.
-        (s.W, s.B, s.O, s.V, s.R, s.J) = s.couleurs # Nous affectons des noms spécifique à chaque couleur.
-        (s.Wf, s.Bf, s.Of, s.Vf, s.Rf, s.Jf) = s.faces # Nous affectons aussi des noms à chaque face.
-        s.numeroDeCouleur = { s.W: 0, s.B: 1, s.O: 2, s.V: 3, s.R: 4, s.J: 5} # Correspondance inverse couleur-nombre.
-        s.valeurParCouleurSommet = { s.W: 0,
-                                   s.J: 1,
-                                   s.B: 0,
-                                   s.V: 2,
-                                   s.O: 0,
-                                   s.R: 4}
-        s.sommetsPosParitee = [0,1,1,0,1,0,0,1]
+
+        ### Données figées, éguales pour toutes les instances:
+        s.sommetsPosParitee = [0,1,0,1,1,0,1,0]
         s.BOVR = [1,2,3,4]
         s.OVRB = [2,3,4,1]
-        # [W-J:Axe 0: 1], [B-V:Axe 1: 2], [O-R:Axe 2: 4]
+        s.inf = float('inf')
         
 # Numérotation arbitraire des arêtes:
 # . 2 .                   
@@ -103,8 +91,8 @@ class Cube:
 # [A = 10]          A J 8 
 # [B = 11]          . 9 . 
         W = 0 ; B = 1 ; O = 2 ; V = 3 ; R = 4 ; J = 5
-        v = lambda a,b : 2**a+2**b # v comme valeur
-        s.v = v
+        s.v = (lambda a,b : 2**a+2**b) # v comme valeur
+        v = s.v
         s.retrouverNumeroArete = {
         v(W,W): -1, v(W,B):  0, v(W,O):  1, v(W,V):  2, v(W,R):  3, v(W,J): -2, # Cas Blancs
         v(J,J): -1, v(J,B):  8, v(J,O):  9, v(J,V): 10, v(J,R): 11, # Cas Jaunes non-blancs
@@ -115,10 +103,43 @@ class Cube:
           # Remarque: nous sommes sur d'avoir énuméré toutes les possibilités, car
           # C(6;2) + C(6;1) = 6!/(2!*4!) + 6!/5! = (6*5/2) + 6 = 3*5 + 6 = 15 + 6 = 21
           # et nous avons bien 21 cas traités.
+
+
+# Numérotation arbitraire des sommets et des arêtes:
+# 2 . 1                    #  . 2 .                   
+# . W .                    #  3 W 1                   
+# 3 . 0                    #  . 0 .                   
+# 3 . 0 0 . 1 1 . 2 2 . 3  #  . 0 . . 1 . . 2 . . 3 . 
+# . B . . O . . V . . R .  #  7 B 4 4 O 5 5 V 6 6 R 7 
+# 7 . 4 4 . 5 5 . 6 6 . 7  #  . 8 . . 9 . . A . . B . 
+#                   6 . 7  #                    . B . 
+#                   . J .  #   [A = 10]         A J 8 
+#                   5 . 4  #   [B = 11]         . 9 . 
+       # Tables de correspondance indiquant les positions dont les blocs vont bouger, ainsi que la nouvelle position associée.
+        s.cyclesSommet = [[0,3,2,1], # Rotation de la face 0 : W : Blanche
+                         [0,4,7,3], # 1: B : Bleu
+                         [0,1,5,4], # 2: O
+                         [1,2,6,5], # 3: V
+                         [2,3,7,6], # 4: R
+                         [4,5,6,7]] # 5: J
+                         
+        s.cyclesArete = [[0,3,2,1], # Rotation de la face 0 : W : Blanche
+                        [0,4,8,7], # 1: B
+                        [1,5,9,4], # 2: O
+                        [2,6,10,5], # 3: V
+                        [3,7,11,6], # 4: R
+                        [11,8,9,10]] # 5: J
         
-        s.couronneHaut = ''.join([ strg[0:3] for strg in s.faces[1:5]]) # On récupère les couronnes à différentes hauteurs
-        s.couronneMil  = ''.join([ strg[3:6] for strg in s.faces[1:5]]) # Ceci facilitera l'identification ensuite.
-        s.couronneBas  = ''.join([ strg[6:9] for strg in s.faces[1:5]])
+        
+        ### Analyse de base des données de génération du cube (chaineU)
+        s.faces = chaineU.split(',')
+        
+        # La facette n°4 (le centre) définit la couleur de la face :
+        s.couleurs = [ face[4] for face in s.faces ]      # Le quatrième caractère est le centre de la face.
+        (s.W, s.B, s.O, s.V, s.R, s.J) = s.couleurs       # Nous affectons des noms spécifique à chaque couleur.
+        (s.Wf, s.Bf, s.Of, s.Vf, s.Rf, s.Jf) = s.faces    # Nous affectons aussi des noms à chaque face.
+        s.numeroDeCouleur = { s.W: 0, s.B: 1, s.O: 2, s.V: 3, s.R: 4, s.J: 5} # Correspondance inverse couleur-nombre.
+        ## Définition des tableaux anneauHaut, anneauBas, couronneHaut, couronneMil et couronneBas
         # Notion d'anneau (haut et bas) correspond à une lecture particulière des faces :
         # 5 4 3
         # 6 . 2 - Face du haut, numérotation de l'anneau,    # 0 1 2
@@ -133,42 +154,17 @@ class Cube:
         Wf,Jf = s.Wf, s.Jf
         s.anneauHaut   = ''.join([ Wf[7:9], Wf[5], Wf[0:3][::-1], Wf[3], Wf[6]])
         s.anneauBas    = ''.join([ Jf[5], Jf[8:5:-1], Jf[3], Jf[0:3]])
-        s.modeleResolu = genModeleResolu(s.couleurs) # Nous intégrons trois modèles, pour les tests
-        s.modeleA = genModeleA(s.couleurs) # ~
-        s.modeleB = genModeleB(s.couleurs) # ~
-        s.modeleC = genModeleC(s.couleurs) # ~
+        s.couronneHaut = ''.join([ strg[0:3] for strg in s.faces[1:5]]) # On récupère les couronnes à différentes hauteurs.
+        s.couronneMil  = ''.join([ strg[3:6] for strg in s.faces[1:5]]) # Ceci facilitera l'identification ensuite.
+        s.couronneBas  = ''.join([ strg[6:9] for strg in s.faces[1:5]])
         
-        # Tables de correspondance indiquant les positions dont les blocs vont bouger, ainsi que la nouvelle position associée.
-        s.quarterSommet = [[(0,4),(4,6),(6,2),(2,0)],
-                           [(0,1),(1,5),(5,4),(4,0)],
-                           [(0,2),(1,0),(3,1),(2,3)], #-# (Version mélangée, c'est plus fun!)
-                           [(6,7),(7,3),(3,2),(2,6)],
-                           [(4,5),(5,7),(7,6),(6,4)],
-                           [(5,1),(1,3),(3,7),(7,5)]] # Les changements de position de type (oldPos,newPos) des Sommets
-        s.quarterArete = [[(0,3),(3,2),(2,1),(1,0)],
-                          [(0,4),(4,8),(8,7),(7,0)],
-                          [(1,5),(4,1),(9,4),(5,9)], #-# (À l'envers, c'est tellement plus fun!)
-                          [(2,6),(6,10),(10,5),(5,2)],
-                          [(3,7),(7,11),(11,6),(6,3)],
-                          [(11,8),(8,9),(9,10),(10,11)]] # Les changements de position de type (oldPos,newPos) des Arête
-        # Version plus conscise :
-        s.cyclesSommet = [[0,4,6,2], # Rotation de la face 0 : W : Blanche
-                         [0,1,5,4], # 1: B
-                         [1,0,2,3], # 2: O
-                         [6,7,3,2], # 3: V
-                         [4,5,7,6], # 4: R
-                         [5,1,3,7]] # 5: J
-        s.cyclesArete = [[0,3,2,1], # Rotation de la face 0 : W : Blanche
-                        [0,4,8,7], # 1: B
-                        [1,5,9,4], # 2: O
-                        [2,6,10,5,], # 3: V
-                        [3,7,11,6], # 4: R
-                        [11,8,9,10]] # 5: J
         s.groupSommets()
         s.groupAretes()
         s.mapSommets()
         s.mapAretes()
+        
         # Fin de __init__
+        #(FIN DE __init__!)
         
     def decrireCube (s):
         """Renvoie l'état du cube"""
@@ -190,18 +186,46 @@ class Cube:
         print( s.decrireCube() )
     
     
+# Numérotation arbitraire des sommets:
+# 2 . 1                   
+# . W .                   
+# 3 . 0                   
+# 3 . 0 0 . 1 1 . 2 2 . 3 
+# . B . . O . . V . . R . 
+# 7 . 4 4 . 5 5 . 6 6 . 7 
+#                   6 . 7 
+#                   . J . 
+#                   5 . 4 
     def identifieSommet (s,bloc3f):
         """ Caractérise un sommet du cube, à partir de trois couleurs d'un bloc.""" 
         # bloc3f contient trois couleurs: trois facettes
         # Identifions la rotation du sommet:
-        orientation = 3
+        orientation = s.inf
         for i,x in enumerate(bloc3f): 
             if x == s.W or x == s.J:
                 orientation = i
-        if orientation == 3:
-            return "Erreur d'orientation de sommet dans la description du cube"
         # Calculons le numero (entre 0 et 7) du sommet:
-        num = sum([ s.valeurParCouleurSommet[x]  for x in bloc3f ])
+        if s.O in bloc3f:
+            if s.B in bloc3f:
+                num = 0
+            elif s.V in bloc3f:
+                num = 1
+            else:
+                num = s.inf
+        elif s.R in bloc3f:
+            if s.B in bloc3f:
+                num = 3
+            elif s.V in bloc3f:
+                num = 2
+            else:
+                num = s.inf
+        else:
+            num = s.inf
+
+        num += 4*(s.J in bloc3f)
+        # Ainsi:
+        # Si bloc3f contient du blanc: 0 <= num < 4
+        # Si bloc3f contient du jaune: 4 <= num < 8 
         return (num,orientation)
 
 # Numérotation arbitraire des arêtes:
@@ -248,28 +272,27 @@ class Cube:
 #                   . J . #                   3 J 5 
 #                   6 . 8 #                   . 7 . 
 #      DOIT DEVENIR :     #      DOIT DEVENIR :     
-# 6 . 2                   # . 2 .                   
+# 2 . 1                   # . 2 .                   
 # . W .                   # 3 W 1                   
-# 4 . 0                   # . 0 .                   
-# 4 . 0 0 . 2 2 . 6 6 . 4 # . 0 . . 1 . . 2 . . 3 . 
+# 3 . 0                   # . 0 .                   
+# 3 . 0 0 . 1 1 . 2 2 . 3 # . 0 . . 1 . . 2 . . 3 . 
 # . B . . O . . V . . R . # 7 B 4 4 O 5 5 V 6 6 R 7 
-# 5 . 1 1 . 3 3 . 7 7 . 5 # . 8 . . 9 . . A . . B . 
-#                   7 . 5 #                   . B . 
+# 7 . 4 4 . 5 5 . 6 6 . 7 # . 8 . . 9 . . A . . B . 
+#                   6 . 7 #                   . B . 
 #                   . J . # [A = 10]          A J 8 
-#                   3 . 1 # [B = 11]          . 9 . 
-# [J:1, V:2, R:4]
+#                   5 . 4 # [B = 11]          . 9 . 
 
     def groupSommets (s):
         """Regroupe les facettes des sommets par 2, selon leur numéro, en vue de leur identification"""
         # On va remplir le tableau viSommets, avec les valeurs voulues.
         # On s'occupe des couches Haut et Bas en même temps.
-        for i,x in enumerate([0,1,3,2]): # Pour chaque sommet...
-            s.viSommets[2*i]   = (s.anneauHaut[2*x+1],
-                                 s.couronneHaut[(3*x+3)%12],
-                                 s.couronneHaut[(3*x+2)%12])
-            s.viSommets[2*i+1] = (s.anneauBas[2*x+1],
-                                 s.couronneBas[(3*x+2)%12],
-                                 s.couronneBas[(3*x+3)%12])
+        for i in range(0,4): # Pour chaque sommet...
+            s.viSommets[i]   = (s.anneauHaut[2*i+1],
+                                 s.couronneHaut[(3*i+3)%12],
+                                 s.couronneHaut[(3*i+2)%12])
+            s.viSommets[i+4] = (s.anneauBas[2*i+1],
+                                 s.couronneBas[(3*i+2)%12],
+                                 s.couronneBas[(3*i+3)%12])
 
     def groupAretes (s):
         """Regroupe les facettes des arêtes par 2, selon leur numéro, en vue de leur identification"""
