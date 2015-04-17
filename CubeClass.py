@@ -378,6 +378,28 @@ class Cube:
         s.listeDesMouvements += couleurFace + action
         s.rotationFace(fNum,nbQuarts)
         
+    def act (s,action):
+        """ Tourne une face, spécifiée selon le code convention-utilisateur """
+        fNum = s.numeroDeCouleur[action[0]]
+        symbol = action[1]
+        if symbol == "+":
+            nbQuarts = 1
+        elif symbol == "-":
+            nbQuarts = 3
+        elif symbol == "²":
+            nbQuarts = 2
+        else:
+            nbQuarts = 0
+        s.move(fNum,nbQuarts)
+
+    def appliquer (s,instruction):
+        """Applique la série de mouvements donnée (selon la convention utilisateur)"""
+        for i in range(0, len(instruction), 2):
+            s.act(instruction[i:i+2])
+    
+    
+    ## Réalisation du cube, étape par étape ##
+        
     def croixW(s):
         """ Effectue une succession de mouvements établissant une croix de blocs bien placés sur la face s.W (Etape 1) """
         
