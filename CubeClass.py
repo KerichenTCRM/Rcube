@@ -155,6 +155,23 @@ class Cube:
         s.mapSommets()
         s.mapAretes()
         # Fin de __init__
+        
+    def decrireCube (s):
+        return "\n".join([
+        "s.sommetsBlocALaPos = {}".format(s.sommetsBlocALaPos),
+        "s.sommetsRoALaPos = {}".format(s.sommetsRoALaPos),
+        "s.aretesBlocALaPos = {}".format(s.aretesBlocALaPos),
+        "s.aretesRoALaPos = {}".format(s.aretesRoALaPos),
+        
+        #"s.sommetsPosDuBloc = {}".format(s.sommetsPosDuBloc),
+        #"s.sommetsRoDuBloc = {}".format(s.sommetsRoDuBloc),
+        #"s.aretesPosDuBloc = {}".format(s.aretesPosDuBloc),
+        #"s.aretesRoDuBloc = {}".format(s.aretesRoDuBloc),
+        ""
+        ])
+    
+    def printCube (s):
+        print( s.decrireCube() )
     
     
     def identifieSommet (s,bloc3f):
