@@ -63,19 +63,39 @@ class Cube:
         s.couleurs = [ face[4] for face in s.faces ] # Le quatrième caractère est le centre de la face.
         (s.W, s.B, s.O, s.V, s.R, s.J) = s.couleurs # Nous affectons des noms spécifique à chaque couleur.
         (s.Wf, s.Bf, s.Of, s.Vf, s.Rf, s.Jf) = s.faces # Nous affectons aussi des noms à chaque face.
+        s.numeroDeCouleur = { s.W: 0, s.B: 1, s.O: 2, s.V: 3, s.R: 4, s.J: 5} # Correspondance inverse couleur-nombre.
         s.valeurParCouleurSommet = { s.W: 0,
                                    s.J: 1,
                                    s.B: 0,
                                    s.V: 2,
                                    s.O: 0,
                                    s.R: 4}
+        s.sommetsPosParitee = [0,1,1,0,1,0,0,1]
         # [W-J:Axe 0: 1], [B-V:Axe 1: 2], [O-R:Axe 2: 4]
-        s.valeurParCouleurArete = { s.W: 0, # Anneau du haut
-                                  s.J: 8, # Anneau du bas
-                                  s.B: 0, # \
-                                  s.O: 1, # . Parcours de l'anneau
-                                  s.V: 2, # . du milieu.
-                                  s.R: 3} # /
+        
+# Numérotation arbitraire des arêtes:
+# . 2 .                   
+# 3 W 1                   
+# . 0 .                   
+# . 0 . . 1 . . 2 . . 3 . 
+# 7 B 4 4 O 5 5 V 6 6 R 7 
+# . 8 . . 9 . . A . . B . 
+#                   . B . 
+# [A = 10]          A J 8 
+# [B = 11]          . 9 . 
+        W = 0 ; B = 1 ; O = 2 ; V = 3 ; R = 4 ; J = 5
+        v = lambda a,b : 2**a+2**b # v comme valeur
+        s.v = v
+        s.retrouverNumeroArete = {
+        v(W,W): -1, v(W,B):  0, v(W,O):  1, v(W,V):  2, v(W,R):  3, v(W,J): -2, # Cas Blancs
+        v(J,J): -1, v(J,B):  8, v(J,O):  9, v(J,V): 10, v(J,R): 11, # Cas Jaunes non-blancs
+        v(B,O):  4, v(O,V):  5, v(V,R):  6, v(R,B):  7, # Cas de la `couronne_milieu`
+        v(B,B): -1, v(O,O): -1, v(V,V): -1, v(R,R): -1, v(B,V): -2, v(O,R): -2 # Autres cas, les erreurs
+        } # -1 est une erreur: deux fois la même couleur 
+          # -2 est une erreur: couleurs de faces opposées
+          # Remarque: nous sommes sur d'avoir énuméré toutes les possibilités, car
+          # C(6;2) + C(6;1) = 6!/(2!*4!) + 6!/5! = (6*5/2) + 6 = 3*5 + 6 = 15 + 6 = 21
+          # et nous avons bien 21 cas traités.
         
         s.couronneHaut = ''.join([ strg[0:3] for strg in s.faces[1:5]]) # On récupère les couronnes à différentes hauteurs
         s.couronneMil  = ''.join([ strg[3:6] for strg in s.faces[1:5]]) # Ceci facilitera l'identification ensuite.
@@ -108,39 +128,43 @@ class Cube:
                            [(5,1),(1,3),(3,7),(7,5)]] # Les changements de position de type (oldPos,newPos) des Sommets
         s.quarterArete = [[(0,3),(3,2),(2,1),(1,0)],
                           [(0,4),(4,8),(8,7),(7,0)],
-                          [(1,5),(4,1),(9,4),(5,9)],
+                          [(1,5),(4,1),(9,4),(5,9)], #-# (À l'envers, c'est tellement plus fun!)
                           [(2,6),(6,10),(10,5),(5,2)],
                           [(3,7),(7,11),(11,6),(6,3)],
                           [(11,8),(8,9),(9,10),(10,11)]] # Les changements de position de type (oldPos,newPos) des Arête
         # Version plus conscise :
-        s.cycleSommet = [[0,4,6,2,0], # Rotation de la face 0 : W : Blanche
-                         [0,1,5,4,0], # 1: B
-                         [1,0,2,3,1], # 2: O
-                         [6,7,3,2,6], # 3: V
-                         [4,5,7,6,4], # 4: R
-                         [5,1,3,7,5]] # 5: J
-        s.cycleArete = [[0,3,2,1,0], # Rotation de la face 0 : W : Blanche
-                        [0,4,8,7,0], # 1: B
-                        [1,4,9,5,9], # 2: O
-                        [2,6,10,5,2], # 3: V
-                        [3,7,11,6,3], # 4: R
-                        [11,8,9,10,11]] # 5: J
-        # End
+        s.cyclesSommet = [[0,4,6,2], # Rotation de la face 0 : W : Blanche
+                         [0,1,5,4], # 1: B
+                         [1,0,2,3], # 2: O
+                         [6,7,3,2], # 3: V
+                         [4,5,7,6], # 4: R
+                         [5,1,3,7]] # 5: J
+        s.cyclesArete = [[0,3,2,1], # Rotation de la face 0 : W : Blanche
+                        [0,4,8,7], # 1: B
+                        [1,5,9,4], # 2: O
+                        [2,6,10,5,], # 3: V
+                        [3,7,11,6], # 4: R
+                        [11,8,9,10]] # 5: J
+        s.groupSommets()
+        s.groupAretes()
+        s.mapSommets()
+        s.mapAretes()
+        # Fin de __init__
     
     
     def identifieSommet (s,bloc3f):
         """ Caractérise un sommet du cube, à partir de trois couleurs d'un bloc.""" 
         # bloc3f contient trois couleurs: trois facettes
         # Identifions la rotation du sommet:
-        rotation = 3
+        orientation = 3
         for i,x in enumerate(bloc3f): 
             if x == s.W or x == s.J:
-                rotation = i
-        if rotation == 3:
-            return "Erreur de sommet dans la description du cube"
+                orientation = i
+        if orientation == 3:
+            return "Erreur d'orientation de sommet dans la description du cube"
         # Calculons le numero (entre 0 et 7) du sommet:
         num = sum([ s.valeurParCouleurSommet[x]  for x in bloc3f ])
-        return (num,rotation)
+        return (num,orientation)
 
 # Numérotation arbitraire des arêtes:
 # . 2 .                   
@@ -156,33 +180,21 @@ class Cube:
         """ Caractérise une arête du cube, à partir de deux couleurs d'un bloc."""
         # bloc2f contient deux couleurs: deux facettes
         # Identifions le numero du bloc:
-        num = 12
-        if s.W in bloc2f or s.J in bloc2f: # Cas simple: l'arrète contient du blanc ou du jaune.
-            num = sum([ s.valeurParCouleurArete[x] for x in bloc2f ])
-        elif s.B in bloc2f: # Sinon, cas complexe: on se trouve sur l'anneau du milieu
-            if s.O in bloc2f:
-                num = 4
-            elif s.R in bloc2f:
-                num = 7
-        elif s.V in bloc2f:
-            if s.O in bloc2f:
-                num = 5
-            elif s.R in bloc2f:
-                num = 6
-        if num == 12:
-            return "Erreur d'arête dans la description du cube"
-        # Identifions maintenant la rotation de l'arête:
-        rotation = 2
+        valeur0 = s.numeroDeCouleur[ bloc2f[0] ]
+        valeur1 = s.numeroDeCouleur[ bloc2f[1] ]
+        num = s.retrouverNumeroArete[ s.v(valeur0,valeur1) ]
+        # Identifions maintenant l'orientation de l'arête:
+        orientation = 2
         for i,x in enumerate(bloc2f):
             if x == s.W or x == s.J: # Verification de la couleur de la facette.
-                rotation = i # Si une des deux facettes correspond, on le retient.
-        if rotation == 2: # Si on a pas pu determiner la rotation, on utilise le bleu-vert:
+                orientation = i # Si une des deux facettes correspond, on le retient.
+        if orientation == 2: # Si on a pas pu determiner l'orientation, on utilise le bleu-vert:
             for i,x in enumerate(bloc2f):
                 if x == s.B or x == s.V:
-                    rotation = i
-        if rotation == 2: # Si la rotation n'est toujours pas déterminée, c'est qu'il y a une erreur.
-            return "Erreur d'arête dans la description du cube"
-        return (num,rotation)
+                    orientation = i
+        if orientation == 2: # Si l'orientation n'est toujours pas déterminée, c'est qu'il y a une erreur.
+            return "Erreur (d'orientation) d'arête dans la description du cube"
+        return (num,orientation)
 
 
 # Le regroupement des sommets et des arêtes:
@@ -253,3 +265,58 @@ class Cube:
             s.aretesRoALaPos[pos] = rot
             s.aretesPosDuBloc[bloc_lu] = pos # A chaque arête, on associe la position corespondante
             s.aretesRoDuBloc[bloc_lu] = rot
+     
+    def diffRoSommets (s,fNum,nbQuarts,old_pos):
+        if fNum != 0 and fNum != 5 and (nbQuarts % 2 != 0) :
+            return 1 + ( fNum + s.sommetsPosParitee[old_pos] + (nbQuarts-1)//2 ) % 2
+        else:
+            return 0
+        
+    def rotationSommets (s,fNum,nbQuarts):
+        # On gère en même temps la position et la rotation
+        # On établit d'abord une liste temporaire, indiquant un bloc, sa nouvelle position, et sa nouvelle rotation.
+        nbQuarts %= 4 # donc nbQuarts = 1,2 ou 3
+        cycle = s.cyclesSommet[fNum]
+        bloc_pos_ro_list = []
+        for i in range(-4,0):
+            oldPos = cycle[i]
+            newPos = cycle[i+nbQuarts]
+            bloc = s.sommetsBlocALaPos[oldPos]
+            oldRo = s.sommetsRoALaPos[oldPos]
+            newRo = (oldRo + s.diffRoSommets(s,fNum,nbQuarts,) ) % 3
+            bloc_pos_ro_list.append( (bloc,newPos,newRo) )
+        # Puis on applique ces valeurs:
+        for bloc,pos,ro in bloc_pos_ro_list:
+            s.sommetsPosDuBloc[bloc] = pos
+            s.sommetsBlocALaPos[pos] = bloc
+            s.sommetsRoDuBloc[bloc] = ro
+            s.sommetsRoALaPos[pos] = ro
+        
+    def diffRoAretes (s,fNum,nbQuarts):
+        return (nbQuarts % 2) * (fNum == 1 or fNum == 3)
+        
+    def rotationAretes (s,fNum,nbQuarts):
+        # On gère en même temps la position et la rotation
+        # On établit d'abord une liste temporaire, indiquant un bloc, sa nouvelle position, et sa nouvelle rotation.
+        nbQuarts %= 4 # donc nbQuarts = 1,2 ou 3
+        cycle = s.cyclesArete[fNum]
+        addRo = s.diffRoAretes(fNum,nbQuarts)
+        bloc_pos_ro_list = []
+        for i in range(-4,0):
+            oldPos = cycle[i]
+            newPos = cycle[i+nbQuarts]
+            bloc = s.aretesBlocALaPos[oldPos]
+            oldRo = s.aretesRoALaPos[oldPos]
+            newRo = (oldRo + addRo) % 2
+            bloc_pos_ro_list.append( (bloc,newPos,newRo) )
+        # Puis on applique ces valeurs:
+        for bloc,pos,ro in bloc_pos_ro_list:
+            s.aretesPosDuBloc[bloc] = pos
+            s.aretesBlocALaPos[pos] = bloc
+            s.aretesRoDuBloc[bloc] = ro
+            s.aretesRoALaPos[pos] = ro
+     
+    def rotationFace (s,face,nbQuarts):
+        fNum = s.numeroDeCouleur[face]
+        s.rotationSommets(fNum,nbQuarts)
+        s.rotationAretes(fNum,nbQuarts)
