@@ -371,3 +371,26 @@ class Cube:
                     move([s.B,s.O,s.V,s.R][[k+1,k-1][i]],[1,3][i]) # -> ----------- ------ -------
                 
                 currentDeg = s.sommetsPosDuBloc[sommet]
+                
+                
+    def Belge(s):
+        """ Effectue une succession de mouvements établissant la deuxième couronne (Etape 3) """
+        
+        for k in range(4):
+            arete = [4,5,6,7][k] # Les 4 blocs à déplacer.
+            
+            (currentPos,currentDeg) = (s.aretesPosDuBloc[arete],s.aretesRoDuBloc[arete])
+            
+            if not(currentPos == arete and currentDeg == 0):# Est-il mal placé ?
+                 if currentPos in (4,5,6,7):
+                    move([s.B,s.O,s.V,s.R][currentPos%4],1)
+                    move(s.J,3)
+                    move([s.B,s.O,s.V,s.R][currentPos%4],3)
+                    move(s.J,3)
+                    move([s.O,s.V,s.R,s.B][currentPos%4],3)
+                    move(s.J,1)
+                    move([s.O,s.V,s.R,s.B][currentPos%4],1)
+                    
+                #L'arête est désormais sur la face jaune
+                
+                 (currentPos,currentDeg) = (s.aretesPosDuBloc[arete],s.aretesRoDuBloc[arete])
