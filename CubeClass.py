@@ -56,6 +56,9 @@ class Cube:
         s.aretesPosDuBloc = [None]*12 # 
         s.aretesRoDuBloc = [None]*12  # 
         # Fin de la pré-création #
+
+        # Initialilisation de la liste des mouvements : celle que renverra l'algorithme:
+        s.listeDesMouvements = ""
         
         ## Définition de valeur propres au cube donné par l'utilisateur.
         s.faces = chaineU.split(',')
@@ -268,9 +271,9 @@ class Cube:
             s.aretesPosDuBloc[bloc_lu] = pos # A chaque arête, on associe la position corespondante
             s.aretesRoDuBloc[bloc_lu] = rot
      
-    def diffRoSommets (s,fNum,nbQuarts,old_pos):
+    def diffRoSommets (s,fNum,nbQuarts,oldPos):
         if fNum != 0 and fNum != 5 and (nbQuarts % 2 != 0) :
-            return 1 + ( fNum + s.sommetsPosParitee[old_pos] + (nbQuarts-1)//2 ) % 2
+            return 1 + ( fNum + s.sommetsPosParitee[oldPos] + (nbQuarts-1)//2 ) % 2
         else:
             return 0
         
@@ -285,7 +288,7 @@ class Cube:
             newPos = cycle[i+nbQuarts]
             bloc = s.sommetsBlocALaPos[oldPos]
             oldRo = s.sommetsRoALaPos[oldPos]
-            newRo = (oldRo + s.diffRoSommets(s,fNum,nbQuarts,) ) % 3
+            newRo = (oldRo + s.diffRoSommets(fNum,nbQuarts,oldPos) ) % 3
             bloc_pos_ro_list.append( (bloc,newPos,newRo) )
         # Puis on applique ces valeurs:
         for bloc,pos,ro in bloc_pos_ro_list:
@@ -323,18 +326,18 @@ class Cube:
         s.rotationAretes(fNum,nbQuarts)
         
     def move (s,numeroFace,nombreDeQuartsDeTour): # Finalement, il semble plus simple de n'utiliser que le numero des faces.
-        couleurFace = s.couleur[numeroFace]
-        if nombreDeQuartDeTour % 4 == 1:
+        couleurFace = s.couleurs[numeroFace]
+        if nombreDeQuartsDeTour % 4 == 1:
             action = "+"
-        elif nombreDeQuartDeTour % 4 == 3:
+        elif nombreDeQuartsDeTour % 4 == 3:
             action = "-"
-        elif nombreDeQuartDeTour % 4 == 2:
+        elif nombreDeQuartsDeTour % 4 == 2:
             action = "²"
-        else: # nombreDeQuartDeTour % 4 == 0
+        else: # nombreDeQuartsDeTour % 4 == 0
             action = ''
             couleurFace = ''
-        s.listDesMouvements += couleurFace + action
-        rotationFace(numeroFace,nombreDeQuartsDeTour)
+        s.listeDesMouvements += couleurFace + action
+        s.rotationFace(numeroFace,nombreDeQuartsDeTour)
         
     def croixW(s):
         """ Effectue une succession de mouvements établissant une croix de blocs bien placés sur la face s.W (Etape 1) """
