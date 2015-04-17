@@ -57,9 +57,6 @@ class Cube:
         s.aretesRoDuBloc = [None]*12  # 
         # Fin de la pré-création #
         
-        #Initialilisation de la liste des mouvements celle que renverra l'algorithme:
-        s.listDesMouvements = ""
-        
         ## Définition de valeur propres au cube donné par l'utilisateur.
         s.faces = chaineU.split(',')
         # La facette n°4 (le centre) définit la couleur de la face :
@@ -319,24 +316,11 @@ class Cube:
             s.aretesRoDuBloc[bloc] = ro
             s.aretesRoALaPos[pos] = ro
      
-    def rotationFace (s,fNum,nbQuarts):
+    def rotationFace (s,face,nbQuarts):
+        fNum = s.numeroDeCouleur[face]
         s.rotationSommets(fNum,nbQuarts)
         s.rotationAretes(fNum,nbQuarts)
         
-    def move (numeroFace,nombreDeQuartsDeTour): # Finalement, il semble plus simple de n'utiliser que le numero des faces.
-        couleurFace = s.couleur[numeroFace]
-        if nombreDeQuartDeTour % 4 == 1:
-            action = "+"
-        elif nombreDeQuartDeTour % 4 == 3:
-            action = "-"
-        elif nombreDeQuartDeTour % 4 == 2:
-            action = "²"
-        else: # nombreDeQuartDeTour % 4 == 0
-            action = ''
-            couleurFace = ''
-        s.listDesMouvements += couleurFace + action
-        rotationFace(numeroFace,nombreDeQuartsDeTour)
-
     def croixW(s):
         """ Effectue une succession de mouvements établissant une croix de blocs bien placés sur la face s.W (Etape 1) """
         
@@ -406,7 +390,33 @@ class Cube:
                     move([s.O,s.V,s.R,s.B][currentPos%4],3)
                     move(s.J,1)
                     move([s.O,s.V,s.R,s.B][currentPos%4],1)
+                    #L'arête est désormais sur la face jaune
                     
-                #L'arête est désormais sur la face jaune
+                (currentPos,currentDeg) = (s.aretesPosDuBloc[arete],s.aretesRoDuBloc[arete])
+                    
+                while (currentPos!=[8,9,10,11][k] and RoDuBloc[arete]==0) or (currentPos!=[9,10,11,8][k] and RoDuBloc[arete]==1):
+                    move(s.J,1)
+                    (currentPos,currentDeg) = (s.aretesPosDuBloc[arete],s.aretesRoDuBloc[arete])
+                    #On place le bloc sous la bonne face pour commencer le belge
+                    
+                    #Doit-on faire le belge à doite ou à gauche?
+                if (currentPos-arete)%2:    #à droite
+                    move(s.J,3)
+                    move([s.O,s.V,s.R,s.B][currentPos%4],3)
+                    move(s.J,1)
+                    move([s.O,s.V,s.R,s.B][currentPos%4],1)
+                    move(s.J,1)
+                    move([s.B,s.O,s.V,s.R][currentPos%4],1)
+                    move(s.J,3)
+                    move([s.B,s.O,s.V,s.R][currentPos%4],3)
+                else:                       # à gauche
+                    move(s.J,1)
+                    move([s.B,s.O,s.V,s.R][currentPos%4],1)
+                    move(s.J,3)
+                    move([s.B,s.O,s.V,s.R][currentPos%4],3)
+                    move(s.J,3)
+                    move([s.O,s.V,s.R,s.B][currentPos%4],3)
+                    move(s.J,1)
+                    move([s.O,s.V,s.R,s.B][currentPos%4],1)
                 
-                 (currentPos,currentDeg) = (s.aretesPosDuBloc[arete],s.aretesRoDuBloc[arete])
+                 
