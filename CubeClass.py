@@ -524,3 +524,57 @@ class Cube:
                     s.move(s.BOVR[currentPos%4],1)
                     s.move(J,3)
                     s.move(s.BOVR[currentPos%4],3)
+    def chaise(s):
+        """établit la grande croix/positionne les 4 dernières arêtes (étape 5)"""
+        PosB=s.aretesPosDuBloc[8]
+        [B,O,V,R,J]=[1,2,3,4,5]
+        a=8-PosB
+        s.move(J,a)  #le bloc 8 est correctement placé      
+        
+        PosB=s.aretesPosDuBloc[8]
+        PosO=s.aretesPosDuBloc[9]
+        PosV=s.aretesPosDuBloc[10]
+        PosR=s.aretesPosDuBloc[11]
+        if not([PosO,PosV,PosR]==[9,10,11]):
+            
+            if not([PosO,PosV,PosR]==[11,9,10]):
+            
+                if PosV==10:                            #   .o.
+                    #Chaise                             #   xox
+                    s.move(R,1)                         #   .o.
+                    s.move(J,2)
+                    s.move(R,3)
+                    s.move(J,3)
+                    s.move(R,1)
+                    s.move(J,3)
+                    s.move(R,3)
+                    
+                if PosO==9:                             #   .x.
+                    #Chaise Verte                       #   oox
+                    s.move(J,3)                         #   .o.
+                    b=O
+                    
+                elif PosR==11:                          #   .x.
+                    #Chaise Orange                      #   xoo
+                    s.move(J,3)                         #   .o.
+                    b=B
+                    
+                elif PosO==11:
+                    #Chaise droite
+                    b=R
+                s.move(b,1)
+                s.move(J,2)
+                s.move(b,3)
+                s.move(J,3)
+                s.move(b,1)
+                s.move(J,3)
+                s.move(b,3)
+            else:
+                #Chaise gauche
+                s.move(O,3)
+                s.move(J,2)
+                s.move(O,1)
+                s.move(J,1)
+                s.move(O,3)
+                s.move(J,1)
+                s.move(O,1)
