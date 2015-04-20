@@ -487,64 +487,40 @@ class Cube:
             
             if not(currentPos == arete and currentDeg == 0):# Est-il mal placé ?
                 if currentPos in (4,5,6,7):
-                    move(s.BOVR[currentPos%4],1)
-                    move(J,3)
-                    move(s.BOVR[currentPos%4],3)
-                    move(J,3)
-                    move(s.OVRB[currentPos%4],3)
-                    move(J,1)
-                    move(s.OVRB[currentPos%4],1)
+                    s.move(s.BOVR[currentPos%4],1)
+                    s.move(J,3)
+                    s.move(s.BOVR[currentPos%4],3)
+                    s.move(J,3)
+                    s.move(s.OVRB[currentPos%4],3)
+                    s.move(J,1)
+                    s.move(s.OVRB[currentPos%4],1)
                     #L'arête est désormais sur la face jaune
                     (currentPos,currentDeg) = (s.aretesPosDuBloc[arete],s.aretesRoDuBloc[arete])
                     
                 if k%2==0:
-                    while (currentPos!=[8,9,10,11][k] and currentDeg==1) or (currentPos!=[9,10,11,8][k] and currentDeg==0):
-                        s.move(J,1)
-                        (currentPos,currentDeg) = (s.aretesPosDuBloc[arete],s.aretesRoDuBloc[arete])
-                        #On place le bloc sous la bonne face pour commencer le belge
-                        
-                        #Doit-on faire le belge à droite ou à gauche?
-                    if (currentPos-arete)%2==1:    #à gauche
-                        s.move(J,1)
-                        s.move(s.BOVR[currentPos%4-1],1)
-                        s.move(J,3)
-                        s.move(s.BOVR[currentPos%4-1],3)
-                        s.move(J,3)
-                        s.move(s.BOVR[currentPos%4],3)
-                        s.move(J,1)
-                        s.move(s.BOVR[currentPos%4],1)
-                    else:                         # à droite
-                        s.move(J,1)
-                        s.move(s.BOVR[currentPos%4],1)
-                        s.move(J,3)
-                        s.move(s.BOVR[currentPos%4],3)
-                        s.move(J,3)
-                        s.move(s.OVRB[currentPos%4],3)
-                        s.move(J,1)
-                        s.move(s.OVRB[currentPos%4],1)
-                
+                    a=k-currentPos+1-currentDeg
                 else:
-                    while (currentPos!=[8,9,10,11][k] and currentDeg==0) or (currentPos!=[9,10,11,8][k] and currentDeg==1):
-                        s.move(J,1)
-                        (currentPos,currentDeg) = (s.aretesPosDuBloc[arete],s.aretesRoDuBloc[arete])
-                        #On place le bloc sous la bonne face pour commencer le belge
+                    a=k-currentPos+currentDeg
+                s.move(J,a)
+                currentPos=s.aretesPosDuBloc[arete]
+                #On place le bloc sous la bonne face pour commencer le belge
                         
-                        #Doit-on faire le belge à droite ou à gauche?
-                    if (currentPos-arete)%2==1:     #à gauche
-                        s.move(J,1)
-                        s.move(s.BOVR[currentPos%4-1],1)
-                        s.move(J,3)
-                        s.move(s.BOVR[currentPos%4-1],3)
-                        s.move(J,3)
-                        s.move(s.BOVR[currentPos%4],3)
-                        s.move(J,1)
-                        s.move(s.BOVR[currentPos%4],1)
-                    else:                           # à droite
-                        s.move(J,3)
-                        s.move(s.OVRB[currentPos%4],3)
-                        s.move(J,1)
-                        s.move(s.OVRB[currentPos%4],1)
-                        s.move(J,1)
-                        s.move(s.BOVR[currentPos%4],1)
-                        s.move(J,3)
-                        s.move(s.BOVR[currentPos%4],3)
+                #Doit-on faire le belge à droite ou à gauche?
+                if (currentPos-arete)%2==1:     #à gauche
+                    s.move(J,1)
+                    s.move(s.BOVR[currentPos%4-1],1)
+                    s.move(J,3)
+                    s.move(s.BOVR[currentPos%4-1],3)
+                    s.move(J,3)
+                    s.move(s.BOVR[currentPos%4],3)
+                    s.move(J,1)
+                    s.move(s.BOVR[currentPos%4],1)
+                else:                           # à droite
+                    s.move(J,3)
+                    s.move(s.OVRB[currentPos%4],3)
+                    s.move(J,1)
+                    s.move(s.OVRB[currentPos%4],1)
+                    s.move(J,1)
+                    s.move(s.BOVR[currentPos%4],1)
+                    s.move(J,3)
+                    s.move(s.BOVR[currentPos%4],3)
