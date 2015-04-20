@@ -455,26 +455,6 @@ class Cube:
                     s.move(s.BOVR[arete-1],3) # -> -----------
                     s.move(W,3)               # -> ----------- # Toujours réorienter la face supérieure !
     
-    def coinsDegJ(s):
-        """ Effectue une succession de mouvements établissant une rotation des derniers blocs mal orientés sur la face s.J (Etape 7) """
-        J = 5 # 5 est le numéro de la face jaune
-        for k in range(3):
-            sommet = [1,3,5][k]
-            
-            currentDeg = s.sommetsRoDuBloc[sommet]
-            
-            while not(currentDeg == 0):
-                for i in range(2): # Partie 1 face de gauche (k+1), Partie 2 face de droite (k-1)
-                    s.move(s.BOVR[[k+1,k-1][i]],[3,1][i]) # -> combinaison partie (i+1)/2
-                    s.move(J,2)                           # -> ----------- ------ -------
-                    s.move(s.BOVR[[k+1,k-1][i]],[1,3][i]) # -> ----------- ------ -------
-                    s.move(J,[1,3][i])                    # -> ----------- ------ -------
-                    s.move(s.BOVR[[k+1,k-1][i]],[3,1][i]) # -> ----------- ------ -------
-                    s.move(J,[1,3][i])                    # -> ----------- ------ -------
-                    s.move(s.BOVR[[k+1,k-1][i]],[1,3][i]) # -> ----------- ------ -------
-                
-                currentDeg = s.sommetsRoDuBloc[sommet]
-
     def belge(s):
         """ Effectue une succession de mouvements établissant la deuxième couronne (Etape 3) """
         
@@ -524,57 +504,73 @@ class Cube:
                     s.move(s.BOVR[currentPos%4],1)
                     s.move(J,3)
                     s.move(s.BOVR[currentPos%4],3)
+    
+    def petitechaise(s,fNum,coté):              #à renommer si vous voulez
+        """effectue les 8 mouvements de la chaise sur une face et dans un sens donné"""
+        [B,O,V,R,J]=[1,2,3,4,5]
+        s.move(fNum,1+2*coté)   #coté=0 =>droite
+        s.move(J,2)             #coté=1 =>gauche
+        s.move(fNum,3-2*coté)
+        s.move(J,3-2*coté)
+        s.move(fNum,1+2*coté)
+        s.move(J,3-2*coté)
+        s.move(fNum,3-2*coté)
+    
     def chaise(s):
         """établit la grande croix/positionne les 4 dernières arêtes (étape 5)"""
         PosB=s.aretesPosDuBloc[8]
         [B,O,V,R,J]=[1,2,3,4,5]
         a=8-PosB
+        c=0
         s.move(J,a)  #le bloc 8 est correctement placé      
         
         PosB=s.aretesPosDuBloc[8]
         PosO=s.aretesPosDuBloc[9]
         PosV=s.aretesPosDuBloc[10]
         PosR=s.aretesPosDuBloc[11]
-        if not([PosO,PosV,PosR]==[9,10,11]):
+        if not([PosO,PosV,PosR]==[9,10,11]): #sont-ils bien placé?
             
-            if not([PosO,PosV,PosR]==[11,9,10]):
-            
-                if PosV==10:                            #   .o.
-                    #Chaise                             #   xox
-                    s.move(R,1)                         #   .o.
-                    s.move(J,2)
-                    s.move(R,3)
-                    s.move(J,3)
-                    s.move(R,1)
-                    s.move(J,3)
-                    s.move(R,3)
+            if PosV==10:                            #   .o.
+                #Chaise                             #   xox
+                s.petitechaise(R,0)                 #   .o.
+                PosO=s.aretesPosDuBloc[9]
+                PosR=s.aretesPosDuBloc[11]
                     
-                if PosO==9:                             #   .x.
-                    #Chaise Verte                       #   oox
-                    s.move(J,3)                         #   .o.
-                    b=O
+            if PosO==9:                             #   .x.
+                #Chaise Verte                       #   oox
+                s.move(J,3)                         #   .o.
+                b=O
                     
-                elif PosR==11:                          #   .x.
-                    #Chaise Orange                      #   xoo
-                    s.move(J,3)                         #   .o.
-                    b=B
+            elif PosR==11:                          #   .x.
+                #Chaise Orange                      #   xoo
+                s.move(J,3)                         #   .o.
+                b=B
                     
-                elif PosO==11:
-                    #Chaise droite
-                    b=R
-                s.move(b,1)
-                s.move(J,2)
-                s.move(b,3)
-                s.move(J,3)
-                s.move(b,1)
-                s.move(J,3)
-                s.move(b,3)
+            elif PosO==11:
+                #Chaise droite
+                b=R
             else:
                 #Chaise gauche
-                s.move(O,3)
-                s.move(J,2)
-                s.move(O,1)
-                s.move(J,1)
-                s.move(O,3)
-                s.move(J,1)
-                s.move(O,1)
+                b=O
+                c=1
+            s.petitechaise(b,c)
+            
+    def coinsDegJ(s):
+        """ Effectue une succession de mouvements établissant une rotation des derniers blocs mal orientés sur la face s.J (Etape 7) """
+        J = 5 # 5 est le numéro de la face jaune
+        for k in range(3):
+            sommet = [1,3,5][k]
+            
+            currentDeg = s.sommetsRoDuBloc[sommet]
+            
+            while not(currentDeg == 0):
+                for i in range(2): # Partie 1 face de gauche (k+1), Partie 2 face de droite (k-1)
+                    s.move(s.BOVR[[k+1,k-1][i]],[3,1][i]) # -> combinaison partie (i+1)/2
+                    s.move(J,2)                           # -> ----------- ------ -------
+                    s.move(s.BOVR[[k+1,k-1][i]],[1,3][i]) # -> ----------- ------ -------
+                    s.move(J,[1,3][i])                    # -> ----------- ------ -------
+                    s.move(s.BOVR[[k+1,k-1][i]],[3,1][i]) # -> ----------- ------ -------
+                    s.move(J,[1,3][i])                    # -> ----------- ------ -------
+                    s.move(s.BOVR[[k+1,k-1][i]],[1,3][i]) # -> ----------- ------ -------
+                
+                currentDeg = s.sommetsRoDuBloc[sommet]
