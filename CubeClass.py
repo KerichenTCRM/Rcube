@@ -514,7 +514,6 @@ class Cube:
             fNum4=fNum3+1
         else:
             fNum4=1
-        
         J=5
         s.move(fNum4,1)
         s.move(fNum3,1)
@@ -541,14 +540,7 @@ class Cube:
         s.move(fNum3,1)
     def lienarretefacepourfaceJ(bloc2f):
         """à partir de l'indice d'une arrête de la face jaune, associe l'indice de l'autre face de contact"""
-        if bloc2f=8:
-            return 1
-        elif bloc2f=9:
-            return 2
-        elif bloc2f=10:
-            return 3
-        else:
-            return 4
+        return (bloc2f-7)
         
     def petitecroixJ(s):
         """réalise la petite croix jaune du cube"""
