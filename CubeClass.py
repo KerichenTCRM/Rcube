@@ -566,7 +566,7 @@ class Cube:
                     s.mvtligne(lienarretefacepourfaceJ(8))
                 else:
                     s.mvtligne(lienarretefacepourfaceJ(9))
-        else:
+        else: #dans l'autre cas on a forcément un une configuration de type J ou ligne horizontale
             for k in range(8,12):
                 if k!=11 and s.aretesRoDuBloc[k]=0 and s.aretesRoDuBloc[k+1]=0: #on cherche les config de type J
                     s.mvttypeJ(lienarretefacepourfaceJ(k),lienarretefacepourfaceJ(k+1))
