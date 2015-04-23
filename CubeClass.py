@@ -505,6 +505,84 @@ class Cube:
                     s.move(J,3)
                     s.move(s.BOVR[currentPos%4],3)
     
+    
+    
+    
+    def mvtligne(s,fNum3):
+        """fait les mouvements correspondant à une configuration de type ligne horizontale avec la face d'indice fNum3 à droite de la ligne horizontale et fNum4 en face de soi"""
+        if fNum3!=4:
+            fNum4=fNum3+1
+        else:
+            fNum4=1
+        
+        J=5
+        s.move(fNum4,1)
+        s.move(fNum3,1)
+        s.move(J,1)
+        s.move(fNum3,3)    
+        s.move(J,3)
+        s.move(fNum4,3)
+    def mvttypeJ(s,fNum1,fNum2):
+        """fait les mouvements correspondant à une configuration de type J avec la face d'indice fNum1 à gauche du J et la face d'indice fNum2 au dessus du J"""
+        if fNum2!=4:    #on créée l'indice du bloc à droite du J
+            fNum3=fNum2+1
+        else:
+            fNum3=1
+        if fNum1!=1:    #on créée l'indice du bloc en dessous du J
+            fNum4=fNum1-1
+        else:
+            fNum4=4
+        J=5
+        s.move(fNum3,3)
+        s.move(J,3)
+        s.move(fNum4,3)
+        s.move(J,1)
+        s.move(fNum4,1)
+        s.move(fNum3,1)
+    def lienarretefacepourfaceJ(bloc2f):
+        """à partir de l'indice d'une arrête de la face jaune, associe l'indice de l'autre face de contact"""
+        if bloc2f=8:
+            return 1
+        elif bloc2f=9:
+            return 2
+        elif bloc2f=10:
+            return 3
+        else:
+            return 4
+        
+    def petitecroixJ(s):
+        """réalise la petite croix jaune du cube"""
+        J=5
+        if s.aretesRoDuBloc[8]!=0 and s.aretesRoDuBloc[9]!=0 and s.aretesRoDuBloc[10]!=0 and s.aretesRoDuBloc[11]!=0: #on traite le cas où le centre jaune est la seule facette jaune sur sa face
+            s.mvtligne()
+            for k in range(8,12):
+                if k!=11 and s.aretesRoDuBloc[k]=0 and s.aretesRoDuBloc[k+1]=0: #on cherche les config de type J
+                    s.mvttypeJ(lienarretefacepourfaceJ(k),lienarretefacepourfaceJ(k+1))
+                elif k=11 and s.aretesRoDuBloc[11]=0 and s.aretesRoDuBloc[8]=0:
+                    s.mvttypeJ(lienarretefacepourfaceJ(11),lienarretefacepourfaceJ(8))
+                elif k!=10 and k!=11 and s.aretesRoDuBloc[k]=0 and s.aretesRoDuBloc[k+2]=0:     #on cherche les config de type ligne horyzontale
+                    s.mvtligne(lienarretefacepourfaceJ(k))
+                elif k=10 and s.aretesRoDuBloc[k]=0 and  s.aretesRoDuBloc[8]=0:
+                    s.mvtligne(lienarretefacepourfaceJ(8))
+                else:
+                    s.mvtligne(lienarretefacepourfaceJ(9))
+        else:
+            for k in range(8,12):
+                if k!=11 and s.aretesRoDuBloc[k]=0 and s.aretesRoDuBloc[k+1]=0: #on cherche les config de type J
+                    s.mvttypeJ(lienarretefacepourfaceJ(k),lienarretefacepourfaceJ(k+1))
+                elif k=11 and s.aretesRoDuBloc[11]=0 and s.aretesRoDuBloc[8]=0:
+                    s.mvttypeJ(lienarretefacepourfaceJ(11),lienarretefacepourfaceJ(8))
+                elif k!=10 and k!=11 and s.aretesRoDuBloc[k]=0 and s.aretesRoDuBloc[k+2]=0:     #on cherche les config de type ligne horyzontale
+                    s.mvtligne(lienarretefacepourfaceJ(k))
+                elif k=10 and s.aretesRoDuBloc[k]=0 and  s.aretesRoDuBloc[8]=0:
+                    s.mvtligne(lienarretefacepourfaceJ(8))
+                else:
+                    s.mvtligne(lienarretefacepourfaceJ(9))
+                    
+    
+    
+    
+    
     def petitechaise(s,fNum,coté):              #à renommer si vous voulez
         """effectue les 8 mouvements de la chaise sur une face et dans un sens donné"""
         [B,O,V,R,J]=[1,2,3,4,5]
