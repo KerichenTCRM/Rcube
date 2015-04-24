@@ -478,25 +478,36 @@ class Cube:
             sommet = [0,1,2,3][k] #4 sommets à placer
             (currentPos,currentDeg) = (s.sommetsPosDuBloc[sommet],s.sommetsRoDuBloc[sommet])
             if not(currentPos == sommet and currentDeg == 0): # Est-il mal placé ? Si oui on l'envoie sur la 3e couronne avec Deg=1
-                if currentPos in (0,1,2,3) and currentDeg==0: # Cas face supérieure avec la bonne orientation
+                if currentPos in (0,1,2,3) and currentDeg==0: # Cas face blanche avec la bonne orientation
                     s.move(indicefacedroiteW(currentPos),3)
                     s.move(J,3)
                     s.move(indicefacedroiteW(currentPos),1)
-                elif currentPos in (0,1,2,3) and currentDeg==1:
+                elif currentPos in (0,1,2,3) and currentDeg==1: #cas face blanche avec un degré de rotation=1
                     s.move(indicefacedroiteW(currentPos),3)
                     s.move(J,3)
                     s.move(indicefacedroiteW(currentPos),1)
-                elif currentPos in (0,1,2,3) and currentDeg==2:
+                elif currentPos in (0,1,2,3) and currentDeg==2: #cas face blanche avec un degré de rotation=2
                     s.move(indicefacedroiteW(currentPos),3)
                     s.move(J,1)
                     s.move(indicefacedroiteW(currentPos),1)
-                elif currentPos in (8,9,10,11) and currentDeg==0:
+                elif currentPos in (8,9,10,11) and currentDeg==0: #cas face jaune avec un degré de rotation=0
                     while s.sommetsPosDuBloc[sommet]!=sommet+4:
-                        res=s.sommetsPosDuBloc[sommet]
                         s.move(J,1)
-                        s.move(indicefacedroiteJ(res,3)
+                    res=s.sommetsPosDuBloc[sommet]    
+                    s.move(indicefacedroiteJ(res,3)
+                    s.move(J,1)
+                    s.move(res,1)
+                currentDeg2=s.sommetsRoDuBloc[sommet]
+                if currentDeg2==1:
+                    while s.sommetsPosDuBloc[sommet]!=sommet+4:
                         s.move(J,1)
-                        s.move(res,1)
+                    currentPos3=s.sommetsPosDuBloc[sommet]
+                    s.move(J,3)
+                    s.move(indicefacedroiteJ(currentPos3),3)
+                    s.move(J,1)
+                    s.move(indicefacedroiteJ(currentPos3),1)
+                else:
+                    while s.sommetsPosDuBloc[sommet]!=sommet+4:
                         
     
     
