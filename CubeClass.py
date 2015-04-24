@@ -469,11 +469,16 @@ class Cube:
         else:
             return (1)
     
-    
+    def indiceface(Posisommet):
+        """donne l'indice de la face lorsque le bloc est situé en bas à droite de la face centrale (avec face blanche au-dessus et face jaune en-dessous)"""
+        if Posisommet!=1:
+            return (indicefacedroiteJ(Posisommet)-1)
+        else:
+            return (4)
     
     def sommetsW(s):
         """place les sommets de la face blanche"""
-        W,J = 0,5
+        J = 5
         for k in range(4):
             sommet = [0,1,2,3][k] #4 sommets à placer
             (currentPos,currentDeg) = (s.sommetsPosDuBloc[sommet],s.sommetsRoDuBloc[sommet])
@@ -497,8 +502,8 @@ class Cube:
                     s.move(indicefacedroiteJ(res,3)
                     s.move(J,1)
                     s.move(res,1)
-                currentDeg2=s.sommetsRoDuBloc[sommet]
-                if currentDeg2==1:
+                currentDeg2=s.sommetsRoDuBloc[sommet]   #notre bloc est maintenant sur la 3e couronne avec un degré de rotation=1ou2
+                if currentDeg2==1:  #Si son deg de rotation=1, on réalise ces manipulations pour bien le placer
                     while s.sommetsPosDuBloc[sommet]!=sommet+4:
                         s.move(J,1)
                     currentPos3=s.sommetsPosDuBloc[sommet]
@@ -508,15 +513,12 @@ class Cube:
                     s.move(indicefacedroiteJ(currentPos3),1)
                 else:
                     while s.sommetsPosDuBloc[sommet]!=sommet+4:
-                        
-    
-    
-    
-    
-    
-    
-    
-    
+                        s.move(J,1)
+                    currentPos3=s.sommetsPosDuBloc[sommet]
+                    s.move(J,1)
+                    s.move(indiceface(currentPos3),1)
+                    s.move(J,3)
+                    s.move(indiceface(currentPos3),3)
     
     
     
