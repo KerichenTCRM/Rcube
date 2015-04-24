@@ -550,11 +550,11 @@ class Cube:
                 s.mvtligne(1)
             else: #dans les autres cas on a forcément une configuration de type J ou ligne horizontale
                 for k in range(8,12):
-                    if k!=11 and s.aretesRoALaPos[k]=0 and s.aretesRoALaPos[k+1]=0: #on cherche les config de type J
+                    if k!=11 and s.aretesRoALaPos[k]==0 and s.aretesRoALaPos[k+1]==0: #on cherche les config de type J
                         s.mvttypeJ(lienarretefacepourfaceJ(k),lienarretefacepourfaceJ(k+1))
-                    elif k=11 and s.aretesRoALaPos[11]=0 and s.aretesRoALaPos[8]=0:
+                    elif k==11 and s.aretesRoALaPos[11]==0 and s.aretesRoALaPos[8]==0:
                         s.mvttypeJ(lienarretefacepourfaceJ(11),lienarretefacepourfaceJ(8))
-                    elif k!=10 and k!=11 and s.aretesRoALaPos[k]=0 and s.aretesRoALaPos[k+2]=0:     #on cherche les config de type ligne horyzontale
+                    elif k!=10 and k!=11 and s.aretesRoALaPos[k]==0 and s.aretesRoALaPos[k+2]==0:     #on cherche les config de type ligne horyzontale
                         s.mvtligne(lienarretefacepourfaceJ(k))
                 
                     
