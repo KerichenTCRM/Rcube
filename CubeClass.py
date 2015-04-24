@@ -455,6 +455,60 @@ class Cube:
                     s.move(s.BOVR[arete-1],3) # -> -----------
                     s.move(W,3)               # -> ----------- # Toujours réorienter la face supérieure !
     
+    def indicefacedroiteW(Posisommet):
+        """donne l'indice de la face située à droite du bloc lorsque le bloc se situe en haut à droite de la face centrale avec la face blanche au-dessus"""
+        if Posisommet!=3:
+            return (Posisommet+2)
+        else:
+            return 1
+    
+    def indicefacedroiteJ(Posisommet):
+        """donne l'indice de la face située à droite du bloc lorsque le bloc se situe en bas à droite de la face centrale avec la face jaune en-dessous"""
+        if Posisommet!=7:
+            return (Posisommet-2)
+        else:
+            return (1)
+    
+    
+    
+    def sommetsW(s):
+        """place les sommets de la face blanche"""
+        W,J = 0,5
+        for k in range(4):
+            sommet = [0,1,2,3][k] #4 sommets à placer
+            (currentPos,currentDeg) = (s.sommetsPosDuBloc[sommet],s.sommetsRoDuBloc[sommet])
+            if not(currentPos == sommet and currentDeg == 0): # Est-il mal placé ? Si oui on l'envoie sur la 3e couronne avec Deg=1
+                if currentPos in (0,1,2,3) and currentDeg==0: # Cas face supérieure avec la bonne orientation
+                    s.move(indicefacedroiteW(currentPos),3)
+                    s.move(J,3)
+                    s.move(indicefacedroiteW(currentPos),1)
+                elif currentPos in (0,1,2,3) and currentDeg==1:
+                    s.move(indicefacedroiteW(currentPos),3)
+                    s.move(J,3)
+                    s.move(indicefacedroiteW(currentPos),1)
+                elif currentPos in (0,1,2,3) and currentDeg==2:
+                    s.move(indicefacedroiteW(currentPos),3)
+                    s.move(J,1)
+                    s.move(indicefacedroiteW(currentPos),1)
+                elif currentPos in (8,9,10,11) and currentDeg==0:
+                    while s.sommetsPosDuBloc[sommet]!=sommet+4:
+                        res=s.sommetsPosDuBloc[sommet]
+                        s.move(J,1)
+                        s.move(indicefacedroiteJ(res,3)
+                        s.move(J,1)
+                        s.move(res,1)
+                        
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     def belge(s):
         """ Effectue une succession de mouvements établissant la deuxième couronne (Etape 3) """
         
@@ -521,6 +575,7 @@ class Cube:
         s.move(fNum3,3)    
         s.move(J,3)
         s.move(fNum4,3)
+    
     def mvttypeJ(s,fNum1,fNum2):
         """fait les mouvements correspondant à une configuration de type J avec la face d'indice fNum1 à gauche du J et la face d'indice fNum2 au dessus du J"""
         if fNum2!=4:    #on créée fNum3, l'indice de la face à droite du J
@@ -538,6 +593,7 @@ class Cube:
         s.move(J,1)
         s.move(fNum4,1)
         s.move(fNum3,1)
+    
     def lienarretefacepourfaceJ(bloc2f):
         """à partir de l'indice d'une arrête de la face jaune, associe l'indice de l'autre face de contact"""
         return (bloc2f-7)
@@ -545,8 +601,8 @@ class Cube:
     def petitecroixJ(s):
         """réalise la petite croix jaune du cube"""
         J=5
-        while s.aretesRoALaPos[8]!=0 or s.aretesRoALaPos[9]!=0 or s.aretesRoALaPos[10]!=0 or s.aretesRoALaPos[11]!=0: #on ne traite pas le cas où la petite croix jaune serait déjà faite
-            if s.aretesRoALaPos[8]!=0 and s.aretesRoALaPos[9]!=0 and s.aretesRoALaPos[10]!=0 and s.aretesRoALaPos[11]!=0: #on traite le cas où le centre jaune est la seule facette jaune sur sa face
+        while s.aretesRoAlapos[8,9,10,11]!=[0,0,0,0]: #on ne traite pas le cas où la petite croix jaune serait déjà faite
+            if s.aretesRoAlapos[8,9,10,11]==[0,0,0,0]: #on traite le cas où le centre jaune est la seule facette jaune sur sa face
                 s.mvtligne(1)
             else: #dans les autres cas on a forcément une configuration de type J ou ligne horizontale
                 for k in range(8,12):
