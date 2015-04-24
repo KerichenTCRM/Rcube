@@ -612,7 +612,7 @@ class Cube:
         """réalise la petite croix jaune du cube"""
         J=5
         while s.aretesRoAlapos[8,9,10,11]!=[0,0,0,0]: #on ne traite pas le cas où la petite croix jaune serait déjà faite
-            if s.aretesRoAlapos[8,9,10,11]==[0,0,0,0]: #on traite le cas où le centre jaune est la seule facette jaune sur sa face
+            if s.aretesRoAlapos[8,9,10,11]==[1,1,1,1]: #on traite le cas où le centre jaune est la seule facette jaune sur sa face
                 s.mvtligne(1)
             else: #dans les autres cas on a forcément une configuration de type J ou ligne horizontale
                 for k in range(8,12):
