@@ -545,32 +545,18 @@ class Cube:
     def petitecroixJ(s):
         """réalise la petite croix jaune du cube"""
         J=5
-        if s.aretesRoALaPos[8]!=0 and s.aretesRoALaPos[9]!=0 and s.aretesRoALaPos[10]!=0 and s.aretesRoALaPos[11]!=0: #on traite le cas où le centre jaune est la seule facette jaune sur sa face
-            s.mvtligne()
-            for k in range(8,12):
-                if k!=11 and s.aretesRoALaPos[k]=0 and s.aretesRoALaPos[k+1]=0: #on cherche les config de type J
-                    s.mvttypeJ(lienarretefacepourfaceJ(k),lienarretefacepourfaceJ(k+1))
-                elif k=11 and s.aretesRoALaPos[11]=0 and s.aretesRoALaPos[8]=0:
-                    s.mvttypeJ(lienarretefacepourfaceJ(11),lienarretefacepourfaceJ(8))
-                elif k!=10 and k!=11 and s.aretesRoALaPos[k]=0 and s.aretesRoALaPos[k+2]=0:     #on cherche les config de type ligne horyzontale
-                    s.mvtligne(lienarretefacepourfaceJ(k))
-                elif k=10 and s.aretesRoALaPos[k]=0 and  s.aretesRoALaPos[8]=0:
-                    s.mvtligne(lienarretefacepourfaceJ(8))
-                else:
-                    s.mvtligne(lienarretefacepourfaceJ(9))
-        elif s.aretesRoALaPos[8]=0 and s.aretesRoALaPos[9]=0 and s.aretesRoALaPos[10]=0 s.aretesRoALaPos[11]=0: #on traite le cas où la petite croix jaune serait déjà faite, dans ce cas la fonction ne réalise aucune manipulation
-        else: #dans les autres cas on a forcément une configuration de type J ou ligne horizontale
-            for k in range(8,12):
-                if k!=11 and s.aretesRoALaPos[k]=0 and s.aretesRoALaPos[k+1]=0: #on cherche les config de type J
-                    s.mvttypeJ(lienarretefacepourfaceJ(k),lienarretefacepourfaceJ(k+1))
-                elif k=11 and s.aretesRoALaPos[11]=0 and s.aretesRoALaPos[8]=0:
-                    s.mvttypeJ(lienarretefacepourfaceJ(11),lienarretefacepourfaceJ(8))
-                elif k!=10 and k!=11 and s.aretesRoALaPos[k]=0 and s.aretesRoALaPos[k+2]=0:     #on cherche les config de type ligne horyzontale
-                    s.mvtligne(lienarretefacepourfaceJ(k))
-                elif k=10 and s.aretesRoALaPos[k]=0 and  s.aretesRoALaPos[8]=0:
-                    s.mvtligne(lienarretefacepourfaceJ(8))
-                else:
-                    s.mvtligne(lienarretefacepourfaceJ(9))
+        while s.aretesRoALaPos[8]!=0 or s.aretesRoALaPos[9]!=0 or s.aretesRoALaPos[10]!=0 or s.aretesRoALaPos[11]!=0: #on ne traite pas le cas où la petite croix jaune serait déjà faite
+            if s.aretesRoALaPos[8]!=0 and s.aretesRoALaPos[9]!=0 and s.aretesRoALaPos[10]!=0 and s.aretesRoALaPos[11]!=0: #on traite le cas où le centre jaune est la seule facette jaune sur sa face
+                s.mvtligne(1)
+            else: #dans les autres cas on a forcément une configuration de type J ou ligne horizontale
+                for k in range(8,12):
+                    if k!=11 and s.aretesRoALaPos[k]=0 and s.aretesRoALaPos[k+1]=0: #on cherche les config de type J
+                        s.mvttypeJ(lienarretefacepourfaceJ(k),lienarretefacepourfaceJ(k+1))
+                    elif k=11 and s.aretesRoALaPos[11]=0 and s.aretesRoALaPos[8]=0:
+                        s.mvttypeJ(lienarretefacepourfaceJ(11),lienarretefacepourfaceJ(8))
+                    elif k!=10 and k!=11 and s.aretesRoALaPos[k]=0 and s.aretesRoALaPos[k+2]=0:     #on cherche les config de type ligne horyzontale
+                        s.mvtligne(lienarretefacepourfaceJ(k))
+                
                     
     
     
