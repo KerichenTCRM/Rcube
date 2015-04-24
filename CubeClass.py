@@ -471,7 +471,7 @@ class Cube:
     
     def indiceface(Posisommet):
         """donne l'indice de la face lorsque le bloc est situé en bas à droite de la face centrale (avec face blanche au-dessus et face jaune en-dessous)"""
-        if Posisommet!=1:
+        if Posisommet!=7:
             return (indicefacedroiteJ(Posisommet)-1)
         else:
             return (4)
@@ -499,26 +499,23 @@ class Cube:
                     while s.sommetsPosDuBloc[sommet]!=sommet+4:
                         s.move(J,1)
                     res=s.sommetsPosDuBloc[sommet]    
-                    s.move(indicefacedroiteJ(res,3)
+                    s.move(indicefacedroiteJ(res),3)
                     s.move(J,1)
-                    s.move(res,1)
+                    s.move(indicefacedroiteJ(res),1)
+                while s.sommetsPosDuBloc[sommet]!=sommet+4: #on place le bloc en dessous de sa future position
+                        s.move(J,1)    
+                currentPos2=s.sommetsPosDuBloc[sommet]
                 currentDeg2=s.sommetsRoDuBloc[sommet]   #notre bloc est maintenant sur la 3e couronne avec un degré de rotation=1ou2
                 if currentDeg2==1:  #Si son deg de rotation=1, on réalise ces manipulations pour bien le placer
-                    while s.sommetsPosDuBloc[sommet]!=sommet+4:
-                        s.move(J,1)
-                    currentPos3=s.sommetsPosDuBloc[sommet]
                     s.move(J,3)
-                    s.move(indicefacedroiteJ(currentPos3),3)
+                    s.move(indicefacedroiteJ(currentPos2),3)
                     s.move(J,1)
-                    s.move(indicefacedroiteJ(currentPos3),1)
+                    s.move(indicefacedroiteJ(currentPos2),1)
                 else:
-                    while s.sommetsPosDuBloc[sommet]!=sommet+4:
-                        s.move(J,1)
-                    currentPos3=s.sommetsPosDuBloc[sommet]
                     s.move(J,1)
-                    s.move(indiceface(currentPos3),1)
+                    s.move(indiceface(currentPos2),1)
                     s.move(J,3)
-                    s.move(indiceface(currentPos3),3)
+                    s.move(indiceface(currentPos2),3)
     
     
     
