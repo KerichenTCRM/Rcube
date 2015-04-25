@@ -1,5 +1,7 @@
 #!/usr/bin/python3
+# -*- coding: utf-8 -*-
 # Résolveur de Rubik's Cube
+import sys
 
 # Génération de modèle, pour les tests de bon fonctionnement.
 def genCouleurs ():
@@ -7,8 +9,7 @@ def genCouleurs ():
 
 def genModeleResolu (couleurs):
     """Génère une chaîne de caractère décrivant un cube résolu."""
-    (W,B,O,V,R,J) = couleurs
-    return ",".join([9*W,9*B,9*O,9*V,9*R,9*J])
+    return ",".join([ 9*laCouleur for laCouleur in couleurs])
 
 def genModeleA (couleurs):
     """Génère une chaîne de caractères décrivant un cube dont les deux premières couronnes sont résolues"""
@@ -38,12 +39,27 @@ def genModeleEtape1 (couleurs): # Complètement mélangé
                      O+W+B+J+B+W+R+V+W, R+B+J+R+O+V+V+R+V, R+B+O+J+V+J+J+V+W, B+O+B+O+R+B+R+O+B,\
                                                                               V+V+W+W+J+R+O+J+O])
 
+def genModeleEtape6 (couleurs):
+    (W,B,O,V,R,J) = couleurs
+    return ",".join([ 9*W, 8*B+J, 8*O+J, 8*V+J, 6*R+B+R+R, O+5*J+R+J+V ])
+
 def genModeleEtape7 (couleurs):
     """Génère une chaîne de caractères décrivant un cube juste avant l'étape 7"""
     (W,B,O,V,R,J) = couleurs
-    return ",".join([W+W+W+W+W+W+W+W+W,\
-                     B+B+B+B+B+B+R+B+O, O+O+O+O+O+O+J+O+O, V+V+V+V+V+V+V+V+V, R+R+R+R+R+R+R+R+J,\
-                                                                              J+J+B+J+J+J+J+J+B])
+    return ",".join([9*W,\
+                     6*B+R+B+O, 6*O+J+O+O, 9*V, 8*R+J,\
+                                     J+J+B+J+J+J+J+J+B])
+
+def resoudreLeCube (description):
+    """Cette fonction renvoie la liste des gestes à effectuer pour résoudre le cube d'après une chaine de caractère de la forme '*********,*********,*********,*********,*********,*********' ; chaque étoile correspondant à une lettre minuscule relative à la couleur de chaque facette.  """
+    cube = Cube(description)
+    return cube.toutResoudre()
+
+### Coeur du code ###
+# print(resoudreLeCube(sys.argv[-1]))
+#####################
+
+
 
 class Cube:
     #W = "w" # 0 # Dessus [W-J Axe 0]
@@ -422,7 +438,7 @@ class Cube:
     
     
     ## Réalisation du cube, étape par étape ##
-        
+    ## Etape 1: Les arêtes de la première face ##
     def croixW(s):
         """ Effectue une succession de mouvements établissant une croix de blocs bien placés sur la face s.W (Etape 1) """
         W,J = 0,5 # Les numéros correspondant aux faces
@@ -455,13 +471,14 @@ class Cube:
                     s.move(s.BOVR[arete-1],3) # -> -----------
                     s.move(W,3)               # -> ----------- # Toujours réorienter la face supérieure !
     
+    ## Etape 2: Les sommets de la première face ##
     def indicefacedroiteW(Posisommet):
         """donne l'indice de la face située à droite du bloc lorsque le bloc se situe en haut à droite de la face centrale avec la face blanche au-dessus"""
         if Posisommet!=3:
             return (Posisommet+2)
         else:
             return 1
-    
+
     def indicefacedroiteJ(Posisommet):
         """donne l'indice de la face située à droite du bloc lorsque le bloc se situe en bas à droite de la face centrale avec la face jaune en-dessous"""
         if Posisommet!=7:
@@ -483,6 +500,7 @@ class Cube:
             sommet = k #pour plus de lisibilité
             (currentPos,currentDeg) = (s.sommetsPosDuBloc[sommet],s.sommetsRoDuBloc[sommet])
             if not(currentPos == sommet and currentDeg == 0): # Est-il mal placé ? Si oui on l'envoie sur la 3e couronne avec Deg=1 ou Deg=2
+                
                 if currentPos in (0,1,2,3) and currentDeg==0: # Cas face blanche avec la bonne orientation
                     s.move(indicefacedroiteW(currentPos),3)
                     s.move(J,3)
@@ -517,8 +535,7 @@ class Cube:
                     s.move(J,3)
                     s.move(indiceface(currentPos2),3)
     
-    
-    
+    ## Etape 3: Les arêtes de la deuxième couronne ##    
     def belge(s):
         """ Effectue une succession de mouvements établissant la deuxième couronne (Etape 3) """
         
@@ -570,8 +587,7 @@ class Cube:
                     s.move(s.BOVR[currentPos%4],3)
     
     
-    
-    
+## Etape 4: L'orientation des arêtes de la dernière face, càd la petite croix ##
     def mvtligne(s,fNum3):
         """fait les mouvements correspondant à une configuration de type ligne horizontale avec la face d'indice fNum3 à droite de la ligne horizontale et fNum4 en face de soi"""
         if fNum3!=4: #on créée fNum4, l'indice de la face en dessous de la ligne
@@ -604,40 +620,40 @@ class Cube:
         s.move(fNum4,1)
         s.move(fNum3,1)
     
-    def lienarretefacepourfaceJ(bloc2f):
+    def lienaretefacepourfaceJ(bloc2f):
         """à partir de l'indice d'une arrête de la face jaune, associe l'indice de l'autre face de contact"""
         return (bloc2f-7)
         
-    def petitecroixJ(s):
+    def petiteCroixJ(s):
         """réalise la petite croix jaune du cube"""
-        J=5
-        while s.aretesRoAlapos[8,9,10,11]!=[0,0,0,0]: #on ne traite pas le cas où la petite croix jaune serait déjà faite
-            if s.aretesRoAlapos[8,9,10,11]==[1,1,1,1]: #on traite le cas où le centre jaune est la seule facette jaune sur sa face
+        J=5 # !!!!!!!!!!!!!!! vvvvvvvvvvv Cette syntaxe ne fonctionne pas !
+        while s.aretesRoALaPos[8,9,10,11]!=[0,0,0,0]: #on ne traite pas le cas où la petite croix jaune serait déjà faite
+            if s.aretesRoALaPos[8,9,10,11]==[1,1,1,1]: #on traite le cas où le centre jaune est la seule facette jaune sur sa face
                 s.mvtligne(1)
             else: #dans les autres cas on a forcément une configuration de type J ou ligne horizontale
                 for k in range(8,12):
                     if k!=11 and s.aretesRoALaPos[k]==0 and s.aretesRoALaPos[k+1]==0: #on cherche les config de type J
-                        s.mvttypeJ(lienarretefacepourfaceJ(k),lienarretefacepourfaceJ(k+1))
+                        s.mvttypeJ(lienaretefacepourfaceJ(k),lienaretefacepourfaceJ(k+1))
                     elif k==11 and s.aretesRoALaPos[11]==0 and s.aretesRoALaPos[8]==0:
-                        s.mvttypeJ(lienarretefacepourfaceJ(11),lienarretefacepourfaceJ(8))
+                        s.mvttypeJ(lienaretefacepourfaceJ(11),lienaretefacepourfaceJ(8))
                     elif k!=10 and k!=11 and s.aretesRoALaPos[k]==0 and s.aretesRoALaPos[k+2]==0:     #on cherche les config de type ligne horyzontale
-                        s.mvtligne(lienarretefacepourfaceJ(k))
+                        s.mvtligne(lienaretefacepourfaceJ(k))
                 
                     
     
     
     
-    
-    def petitechaise(s,fNum,coté):              #à renommer si vous voulez
+## Etape 5: positionnement des aretes de la derniere face, càd grande croix ##
+    def petitechaise(s,fNum,cote):              #à renommer si vous voulez
         """effectue les 8 mouvements de la chaise sur une face et dans un sens donné"""
         [B,O,V,R,J]=[1,2,3,4,5]
-        s.move(fNum,1+2*coté)   #coté=0 =>droite
-        s.move(J,2)             #coté=1 =>gauche
-        s.move(fNum,3-2*coté)
-        s.move(J,3-2*coté)
-        s.move(fNum,1+2*coté)
-        s.move(J,3-2*coté)
-        s.move(fNum,3-2*coté)
+        s.move(fNum,1+2*cote)   #cote=0 =>droite
+        s.move(J,2)             #cote=1 =>gauche
+        s.move(fNum,3-2*cote)
+        s.move(J,3-2*cote)
+        s.move(fNum,1+2*cote)
+        s.move(J,3-2*cote)
+        s.move(fNum,3-2*cote)
     
     def chaise(s):
         """établit la grande croix/positionne les 4 dernières arêtes (étape 5)"""
@@ -677,8 +693,58 @@ class Cube:
                 b=O
                 c=1
             s.petitechaise(b,c)
-            
-    def coinsDegJ(s):
+
+### Etape 6: positionnement des sommets de la dernière face ###
+    ## Schéma:
+    # Des sommets en haut :  . B . O . V . R . B .
+    # Numéro de la face:     . 1 . 2 . 3 . 4 . 1 .
+    # Numéro du sommet fixe: 3 . 0 . 1 . 2 . 3 . 0
+    def coinsPermuPosJ (s,sommet_fixe,sns) :
+        """Permute trois sommets de la face J sans affecter les autres blocs du cube.
+    `sommet_fixe` indique le numéro (0-3) du sommet qui ne sera pas déplacé.
+    `sns` indique le sens (1 ou -1) de la permutation. 1: sens horaire, -1: sens anti-horaire"""
+        w = lambda k: 1 + (sommet_fixe+k-1) % 4 # Calcule le numéro de la face.
+        face     = [w(0),   5,w(2),   5,w(0),   5,w(2),   5]
+        nbQuarts = [ sns,-sns,-sns, sns,-sns,-sns, sns, sns] # Le sens de rotation des faces dépend de la diretion de permutation.
+        # Si la permutation doit être anti-horaire, on inverse l'ordre des mouvements (et leur direction, voire ci-dessus)
+        for i in range(0,8)[::d]:
+            s.move(face[i],nbQuarts[i])
+        
+        
+    def coinsPosJ (s):
+        """Place les sommets de la face J à leur position, sans affecter la position, ni la rotation des autres blocs du cube."""
+        # Trois cas sont possibles:
+        # 1) aucun sommet n'est à la bonne position. dans ce cas: 1 -> 2
+        # 2) seule un sommet est la bonne position. Dans ce cas: 2 -> 3
+        # 3) les quatres sommets sont correctemments placés 3 = OK ;)
+        # 
+        sommet = s.sommetALaPos[4:8]
+        estBienPlace = []
+        for i,val in enumerate(sommet):
+            if val == i:
+                estBienPlace.append(i)
+        compte = len(estBienPlace) # On compte le nombre de sommet bien placés
+
+        if compte == 0: # Si aucun n'est bien placé, le seul cas possible est que les sommets soit chacun à l'opposé de leur position.
+            s.coinsPermuPosJ(0,1)  # L'enchaînement de ces deux suites de mouvements
+            s.coinsPermuPosJ(3,-1) # Résoud la situation.
+        
+        if compte == 1: # Un unique sommet est bien placé
+            fixe = estBienPlace[0] % 4 # On trouve le sommet qui est bien place
+            suivant = (fixe + 1) % 4   # Le sommet suivant
+            oppose =  (fixe + 2) % 4   # Et le sommet encore après, afin de déterminer le sens du mouvement
+            sens = (1 if s.sommetALaPos[suivant] == oppose else -1) # On établi le sens de la permutation
+            s.coinsPermuPos(fixe-4,direction)
+        
+        if compte in [2,3]: # Il ne peut jamais y avoir exactement 2, ni 3 sommets bien positionnés.
+            return "Erreur: Cube irrésolvable car mal remonté: imparité des positions sommets-arêtes."
+        
+        compte = ([ sommet[i] == i + 4 for i in range(4)]) # On recompte le nombre de sommet bien placés
+        if compte != 4: # Pour s'assurer que tout à bien fonctionné.
+            return "Erreur lors du placement des sommets de la dernières face."
+
+    ### Orientation des sommets de la dernière face
+    def coinsDegJ (s):
         """ Effectue une succession de mouvements établissant une rotation des derniers blocs mal orientés sur la face s.J (Etape 7) """
         J = 5 # 5 est le numéro de la face jaune
         for k in range(3):
@@ -697,3 +763,17 @@ class Cube:
                     s.move(s.BOVR[[k+1,k-1][i]],[1,3][i]) # -> ----------- ------ -------
                 
                 currentDeg = s.sommetsRoDuBloc[sommet]
+
+
+    def toutResoudre (s):
+        """Fait la résolution complete du cube"""
+        # TODO, les valeurs dans étapes ne sont pas toutes correctes, notemment s.coinsDegJ
+        etapes = [s.croixW, s.sommetsW, s.belge, s.petiteCroixJ, s.chaise, s.coinsPosJ, s.coinsDegJ]
+        message = ""
+        i = 0
+        while not(message) and i < len(etapes):
+            message = etapes[i]()
+            i += 1
+        if message:
+            return message
+        return s.listeDesMouvements
