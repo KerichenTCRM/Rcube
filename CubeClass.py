@@ -546,7 +546,7 @@ class Cube:
                     s.move(s.indicefacedroiteW(currentPos),3)
                     s.move(J,1)
                     s.move(s.indicefacedroiteW(currentPos),1)
-                elif currentPos in (8,9,10,11) and currentDeg==0: #cas face jaune avec un degré de rotation=0
+                elif currentPos in (4,5,6,7) and currentDeg==0: #cas face jaune avec un degré de rotation=0
                     while s.sommetsPosDuBloc[sommet]!=sommet+4:
                         s.move(J,1)
                     res=s.sommetsPosDuBloc[sommet]    
