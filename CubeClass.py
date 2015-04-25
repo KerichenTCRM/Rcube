@@ -501,24 +501,24 @@ class Cube:
                     s.move(W,3)               # -> ----------- # Toujours réorienter la face supérieure !
     
     ## Etape 2: Les sommets de la première face ##
-    def indicefacedroiteW(Posisommet):
+    def indicefacedroiteW(s,Posisommet):
         """donne l'indice de la face située à droite du bloc lorsque le bloc se situe en haut à droite de la face centrale avec la face blanche au-dessus"""
         if Posisommet!=3:
             return (Posisommet+2)
         else:
             return 1
 
-    def indicefacedroiteJ(Posisommet):
+    def indicefacedroiteJ(s,Posisommet):
         """donne l'indice de la face située à droite du bloc lorsque le bloc se situe en bas à droite de la face centrale avec la face jaune en-dessous"""
         if Posisommet!=7:
             return (Posisommet-2)
         else:
             return (1)
     
-    def indiceface(Posisommet):
+    def indiceface(s,Posisommet):
         """donne l'indice de la face lorsque le bloc est situé en bas à droite de la face centrale (avec face blanche au-dessus et face jaune en-dessous)"""
         if Posisommet!=7:
-            return (indicefacedroiteJ(Posisommet)-1)
+            return (s.indicefacedroiteJ(Posisommet)-1)
         else:
             return (4)
     
@@ -530,38 +530,38 @@ class Cube:
             (currentPos,currentDeg) = (s.sommetsPosDuBloc[sommet],s.sommetsRoDuBloc[sommet])
             if not(currentPos == sommet and currentDeg == 0): # Est-il mal placé ? Si oui on l'envoie sur la 3e couronne avec Deg=1 ou Deg=2
                 if currentPos in (0,1,2,3) and currentDeg==0: # Cas face blanche avec la bonne orientation
-                    s.move(indicefacedroiteW(currentPos),3)
+                    s.move(s.indicefacedroiteW(currentPos),3)
                     s.move(J,3)
-                    s.move(indicefacedroiteW(currentPos),1)
+                    s.move(s.indicefacedroiteW(currentPos),1)
                 elif currentPos in (0,1,2,3) and currentDeg==1: #cas face blanche avec un degré de rotation=1
-                    s.move(indicefacedroiteW(currentPos),3)
+                    s.move(s.indicefacedroiteW(currentPos),3)
                     s.move(J,3)
-                    s.move(indicefacedroiteW(currentPos),1)
+                    s.move(s.indicefacedroiteW(currentPos),1)
                 elif currentPos in (0,1,2,3) and currentDeg==2: #cas face blanche avec un degré de rotation=2
-                    s.move(indicefacedroiteW(currentPos),3)
+                    s.move(s.indicefacedroiteW(currentPos),3)
                     s.move(J,1)
-                    s.move(indicefacedroiteW(currentPos),1)
+                    s.move(s.indicefacedroiteW(currentPos),1)
                 elif currentPos in (8,9,10,11) and currentDeg==0: #cas face jaune avec un degré de rotation=0
                     while s.sommetsPosDuBloc[sommet]!=sommet+4:
                         s.move(J,1)
                     res=s.sommetsPosDuBloc[sommet]    
-                    s.move(indicefacedroiteJ(res),3)
+                    s.move(s.indicefacedroiteJ(res),3)
                     s.move(J,1)
-                    s.move(indicefacedroiteJ(res),1)
+                    s.move(s.indicefacedroiteJ(res),1)
                 while s.sommetsPosDuBloc[sommet]!=sommet+4: #on place le bloc en dessous de sa future position
                         s.move(J,1)    
                 currentPos2=s.sommetsPosDuBloc[sommet]
                 currentDeg2=s.sommetsRoDuBloc[sommet]   #notre bloc est maintenant sur la 3e couronne avec un degré de rotation=1ou2
                 if currentDeg2==1:  #Si son deg de rotation=1, on réalise ces manipulations pour bien le placer
                     s.move(J,3)
-                    s.move(indicefacedroiteJ(currentPos2),3)
+                    s.move(s.indicefacedroiteJ(currentPos2),3)
                     s.move(J,1)
-                    s.move(indicefacedroiteJ(currentPos2),1)
+                    s.move(s.indicefacedroiteJ(currentPos2),1)
                 else:
                     s.move(J,1)
-                    s.move(indiceface(currentPos2),1)
+                    s.move(s.indiceface(currentPos2),1)
                     s.move(J,3)
-                    s.move(indiceface(currentPos2),3)
+                    s.move(s.indiceface(currentPos2),3)
     
     ## Etape 3: Les arêtes de la deuxième couronne ##    
     def belge(s):
@@ -648,7 +648,7 @@ class Cube:
         s.move(fNum4,1)
         s.move(fNum3,1)
     
-    def lienaretefacepourfaceJ(bloc2f):
+    def lienaretefacepourfaceJ(s,bloc2f):
         """à partir de l'indice d'une arrête de la face jaune, associe l'indice de l'autre face de contact"""
         return (bloc2f-7)
         
@@ -661,11 +661,11 @@ class Cube:
             else: #dans les autres cas on a forcément une configuration de type J ou ligne horizontale
                 for k in range(8,12):
                     if k!=11 and s.aretesRoALaPos[k]==0 and s.aretesRoALaPos[k+1]==0: #on cherche les config de type J
-                        s.mvttypeJ(lienaretefacepourfaceJ(k),lienaretefacepourfaceJ(k+1))
+                        s.mvttypeJ(s.lienaretefacepourfaceJ(k),s.lienaretefacepourfaceJ(k+1))
                     elif k==11 and s.aretesRoALaPos[11]==0 and s.aretesRoALaPos[8]==0:
-                        s.mvttypeJ(lienaretefacepourfaceJ(11),lienaretefacepourfaceJ(8))
+                        s.mvttypeJ(s.lienaretefacepourfaceJ(11),s.lienaretefacepourfaceJ(8))
                     elif k!=10 and k!=11 and s.aretesRoALaPos[k]==0 and s.aretesRoALaPos[k+2]==0:     #on cherche les config de type ligne horyzontale
-                        s.mvtligne(lienaretefacepourfaceJ(k))
+                        s.mvtligne(s.lienaretefacepourfaceJ(k))
                 
                     
     
