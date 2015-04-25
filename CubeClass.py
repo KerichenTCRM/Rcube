@@ -648,24 +648,24 @@ class Cube:
         s.move(fNum4,1)
         s.move(fNum3,1)
     
-    def lienaretefacepourfaceJ(s,bloc2f):
+    def lienAreteFacePourFaceJ(s,bloc2f):
         """à partir de l'indice d'une arrête de la face jaune, associe l'indice de l'autre face de contact"""
         return (bloc2f-7)
         
     def petiteCroixJ(s):
         """réalise la petite croix jaune du cube"""
-        J=5 # !!!!!!!!!!!!!!! vvvvvvvvvvv Cette syntaxe ne fonctionne pas !
+        J=5
         while s.aretesRoALaPos[8:]!=[0,0,0,0]: #on ne traite pas le cas où la petite croix jaune serait déjà faite
             if s.aretesRoALaPos[8:]==[1,1,1,1]: #on traite le cas où le centre jaune est la seule facette jaune sur sa face
                 s.mvtligne(1)
             else: #dans les autres cas on a forcément une configuration de type J ou ligne horizontale
                 for k in range(8,12):
                     if k!=11 and s.aretesRoALaPos[k]==0 and s.aretesRoALaPos[k+1]==0: #on cherche les config de type J
-                        s.mvttypeJ(s.lienaretefacepourfaceJ(k),s.lienaretefacepourfaceJ(k+1))
+                        s.mvttypeJ(s.lienAreteFacePourFaceJ(k),s.lienAreteFacePourFaceJ(k+1))
                     elif k==11 and s.aretesRoALaPos[11]==0 and s.aretesRoALaPos[8]==0:
-                        s.mvttypeJ(s.lienaretefacepourfaceJ(11),s.lienaretefacepourfaceJ(8))
+                        s.mvttypeJ(s.lienAreteFacePourFaceJ(11),s.lienAreteFacePourFaceJ(8))
                     elif k!=10 and k!=11 and s.aretesRoALaPos[k]==0 and s.aretesRoALaPos[k+2]==0:     #on cherche les config de type ligne horyzontale
-                        s.mvtligne(s.lienaretefacepourfaceJ(k))
+                        s.mvtligne(s.lienAreteFacePourFaceJ(k))
                 
                     
     
