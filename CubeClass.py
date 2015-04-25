@@ -210,7 +210,7 @@ class Cube:
         
         # Fin de __init__
         #(FIN DE __init__!)
-        
+     
     def decrireCube (s):
         """Renvoie l'état du cube"""
         return "\n".join([
@@ -223,14 +223,15 @@ class Cube:
         #"s.sommetsRoDuBloc = {}".format(s.sommetsRoDuBloc),
         #"s.aretesPosDuBloc = {}".format(s.aretesPosDuBloc),
         #"s.aretesRoDuBloc = {}".format(s.aretesRoDuBloc),
-        ""
+        
+        "s.listeDesMouvements = {}".format(s.listeDesMouvements)
         ])
-    
+     
     def printCube (s):
         """Affiche l'état du cube"""
         print( s.decrireCube() )
-    
-    
+     
+     
 # Numérotation arbitraire des sommets:
 # 2 . 1                   
 # . W .                   
