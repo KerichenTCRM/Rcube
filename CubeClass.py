@@ -648,10 +648,6 @@ class Cube:
         s.move(J,1)
         s.move(fNum4,1)
         s.move(fNum3,1)
-    
-    def lienAreteFacePourFaceJ(s,bloc2f):
-        """à partir de l'indice d'une arrête de la face jaune, associe l'indice de l'autre face de contact"""
-        return (bloc2f-7)
         
     def petiteCroixJ(s):
         """réalise la petite croix jaune du cube"""
@@ -661,11 +657,11 @@ class Cube:
                 s.mvtligne(1)
             for k in range(8,12): #on a alors forcément une configuration de type J ou ligne horizontale
                 if k!=11 and s.aretesRoALaPos[k]==0 and s.aretesRoALaPos[k+1]==0: #on cherche les config de type J
-                    s.mvttypeJ(s.lienAreteFacePourFaceJ(k),s.lienAreteFacePourFaceJ(k+1))
+                    s.mvttypeJ(k-7,k-6)
                 elif k==11 and s.aretesRoALaPos[11]==0 and s.aretesRoALaPos[8]==0:
-                    s.mvttypeJ(s.lienAreteFacePourFaceJ(11),s.lienAreteFacePourFaceJ(8))
+                    s.mvttypeJ(4,1)
                 elif k!=10 and k!=11 and s.aretesRoALaPos[k]==0 and s.aretesRoALaPos[k+2]==0:     #on cherche les config de type ligne horyzontale
-                    s.mvtligne(s.lienAreteFacePourFaceJ(k))
+                    s.mvtligne(k-7)
                 
                     
     
