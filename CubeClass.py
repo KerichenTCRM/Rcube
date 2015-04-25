@@ -38,12 +38,13 @@ def genModeleEtape1 (couleurs): # Complètement mélangé
     return ",".join([J+R+V+W+W+O+W+B+J,\
                      O+W+B+J+B+W+R+V+W, R+B+J+R+O+V+V+R+V, R+B+O+J+V+J+J+V+W, B+O+B+O+R+B+R+O+B,\
                                                                               V+V+W+W+J+R+O+J+O])
+
 def genModeleEtape2 (couleurs): # Croix blanche faite
     """Génère une chaîne de caractères décrivant un cube pour les tests de l'étape 2"""
     (W,B,O,V,R,J) = couleurs
-    return ",".join([W+W+V+W+W+W+R+W+J,\
-                     V+B+O+J+B+J+B+B+V, B+O+J+V+O+J+J+J+O, R+V+R+O+V+R+J+R+J, B+R+W+V+R+R+R+O+O,\
-                                                                              B+V+W+B+J+O+V+B+O])
+    return ",".join([R+W+R+W+W+W+R+W+J,\
+                     B+B+O+J+B+B+O+B+J, B+O+W+O+O+R+V+R+O, V+V+B+V+V+R+B+J+O, W+R+J+B+R+V+W+O+J,\
+                                                                              V+V+V+O+J+J+W+J+R])
 
 def genModeleEtape3 (couleurs): # Face blanche faite
     """Génère une chaîne de caractères décrivant un cube pour les tests de l'étape 3 """
