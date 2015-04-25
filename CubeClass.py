@@ -38,17 +38,46 @@ def genModeleEtape1 (couleurs): # Complètement mélangé
     return ",".join([J+R+V+W+W+O+W+B+J,\
                      O+W+B+J+B+W+R+V+W, R+B+J+R+O+V+V+R+V, R+B+O+J+V+J+J+V+W, B+O+B+O+R+B+R+O+B,\
                                                                               V+V+W+W+J+R+O+J+O])
-
-def genModeleEtape6 (couleurs):
+def genModeleEtape2 (couleurs): # Croix blanche faite
+    """Génère une chaîne de caractères décrivant un cube pour les tests de l'étape 2"""
     (W,B,O,V,R,J) = couleurs
-    return ",".join([ 9*W, 8*B+J, 8*O+J, 8*V+J, 6*R+B+R+R, O+5*J+R+J+V ])
+    return ",".join([W+W+V+W+W+W+R+W+J,\
+                     V+B+O+J+B+J+B+B+V, B+O+J+V+O+J+J+J+O, R+V+R+O+V+R+J+R+J, B+R+W+V+R+R+R+O+O,\
+                                                                              B+V+W+B+J+O+V+B+O])
 
-def genModeleEtape7 (couleurs):
+def genModeleEtape3 (couleurs): # Face blanche faite
+    """Génère une chaîne de caractères décrivant un cube pour les tests de l'étape 3 """
+    (W,B,O,V,R,J) = couleurs
+    return ",".join([9*W,\
+                     3*B+B+B+B+J+O+O, 3*O+R+O+V+J+R+B, 3*V+O+V+J+J+R+V, 3*R+B+R+O+R+J+V,\
+                                                                       J+V+O+V+J+J+R+J+B])
+
+def genModeleEtape4 (couleurs): # Deuxième couronne faite
+    """Génère une chaîne de caractères décrivant un cube pour les tests de l'étape 4"""
+    (W,B,O,V,R,J) = couleurs
+    return ",".join([9*W,\
+                     6*B+B+J+B, 6*O+O+J+V, 6*V+J+O+J, 6*R+V+B+R,\
+                                               R+J+J+J+J+R+O+V+J])
+
+def genModeleEtape5 (couleurs): # Orientation des arêtes de la face Jaune faite
+    """Génère une chaîne de caractères décrivant un cube pour les tests de l'étape 5"""
+    (W,B,O,V,R,J) = couleurs
+    return ",".join([9*W,\
+                     6*B+O+O+J, 6*O+V+R+J, 6*V+R+B+J, 6*R+O+V+B,\
+                                                    V+5*J+B+J+R])
+
+def genModeleEtape6 (couleurs): # Orientation et positionnement des arêtes de la face Jaune fait
+    """Génère une chaîne de caractères décrivant un cube pour les tests de l'étape 6"""
+    (W,B,O,V,R,J) = couleurs
+    return ",".join([ 9*W, 6*B+O+B+B, 8*O+J, 8*V+J, 8*R+J, B+J+V+3*J+R+J+J ])
+
+def genModeleEtape7 (couleurs): # Positionnement des sommets de la face Jaune faite
     """Génère une chaîne de caractères décrivant un cube juste avant l'étape 7"""
     (W,B,O,V,R,J) = couleurs
     return ",".join([9*W,\
                      6*B+R+B+O, 6*O+J+O+O, 9*V, 8*R+J,\
                                      J+J+B+J+J+J+J+J+B])
+
 
 def resoudreLeCube (description):
     """Cette fonction renvoie la liste des gestes à effectuer pour résoudre le cube d'après une chaine de caractère de la forme '*********,*********,*********,*********,*********,*********' ; chaque étoile correspondant à une lettre minuscule relative à la couleur de chaque facette.  """
