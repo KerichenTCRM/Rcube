@@ -776,7 +776,7 @@ class Cube:
         """ Effectue une succession de mouvements établissant une rotation des derniers blocs mal orientés sur la face s.J (Etape 7) """
         J = 5 # 5 est le numéro de la face jaune
         for k in range(3):
-            sommet = [1,3,5][k]
+            sommet = [4,5,6][k]
             
             currentDeg = s.sommetsRoDuBloc[sommet]
             
