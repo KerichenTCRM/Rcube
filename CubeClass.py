@@ -627,8 +627,8 @@ class Cube:
     def petiteCroixJ(s):
         """réalise la petite croix jaune du cube"""
         J=5 # !!!!!!!!!!!!!!! vvvvvvvvvvv Cette syntaxe ne fonctionne pas !
-        while s.aretesRoALaPos[8,9,10,11]!=[0,0,0,0]: #on ne traite pas le cas où la petite croix jaune serait déjà faite
-            if s.aretesRoALaPos[8,9,10,11]==[1,1,1,1]: #on traite le cas où le centre jaune est la seule facette jaune sur sa face
+        while s.aretesRoALaPos[8:]!=[0,0,0,0]: #on ne traite pas le cas où la petite croix jaune serait déjà faite
+            if s.aretesRoALaPos[8:]==[1,1,1,1]: #on traite le cas où le centre jaune est la seule facette jaune sur sa face
                 s.mvtligne(1)
             else: #dans les autres cas on a forcément une configuration de type J ou ligne horizontale
                 for k in range(8,12):
