@@ -717,7 +717,7 @@ class Cube:
                 b=O
                 c=1
             s.petitechaise(b,c)
-
+     
 ### Etape 6: positionnement des sommets de la dernière face ###
     ## Schéma:
     # Des sommets en haut :  . B . O . V . R . B .
@@ -731,7 +731,7 @@ class Cube:
         face     = [w(0),   5,w(2),   5,w(0),   5,w(2),   5]
         nbQuarts = [ sns,-sns,-sns, sns,-sns,-sns, sns, sns] # Le sens de rotation des faces dépend de la diretion de permutation.
         # Si la permutation doit être anti-horaire, on inverse l'ordre des mouvements (et leur direction, voire ci-dessus)
-        for i in range(0,8)[::d]:
+        for i in range(0,8)[::sns]:
             s.move(face[i],nbQuarts[i])
         
         
@@ -742,23 +742,22 @@ class Cube:
         # 2) seule un sommet est la bonne position. Dans ce cas: 2 -> 3
         # 3) les quatres sommets sont correctemments placés 3 = OK ;)
         # 
-        sommet = s.sommetALaPos[4:8]
+        sommet = s.sommetsBlocALaPos[4:8]
         estBienPlace = []
         for i,val in enumerate(sommet):
-            if val == i:
+            if val == i+4:
                 estBienPlace.append(i)
         compte = len(estBienPlace) # On compte le nombre de sommet bien placés
-
         if compte == 0: # Si aucun n'est bien placé, le seul cas possible est que les sommets soit chacun à l'opposé de leur position.
             s.coinsPermuPosJ(0,1)  # L'enchaînement de ces deux suites de mouvements
-            s.coinsPermuPosJ(3,-1) # Résoud la situation.
+            s.coinsPermuPosJ(3,1) # Résoud la situation.
         
         if compte == 1: # Un unique sommet est bien placé
             fixe = estBienPlace[0] % 4 # On trouve le sommet qui est bien place
             suivant = (fixe + 1) % 4   # Le sommet suivant
             oppose =  (fixe + 2) % 4   # Et le sommet encore après, afin de déterminer le sens du mouvement
-            sens = (1 if s.sommetALaPos[suivant] == oppose else -1) # On établi le sens de la permutation
-            s.coinsPermuPos(fixe-4,direction)
+            sens = (1 if s.sommetsBlocALaPos[suivant] == oppose else -1) # On établi le sens de la permutation
+            s.coinsPermuPosJ(fixe-4,sens)
         
         if compte in [2,3]: # Il ne peut jamais y avoir exactement 2, ni 3 sommets bien positionnés.
             return "Erreur: Cube irrésolvable car mal remonté: imparité des positions sommets-arêtes."
