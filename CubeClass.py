@@ -480,9 +480,9 @@ class Cube:
         """place les sommets de la face blanche"""
         J = 5
         for k in range(4):
-            sommet = [0,1,2,3][k] #4 sommets à placer
+            sommet = k #pour plus de lisibilité
             (currentPos,currentDeg) = (s.sommetsPosDuBloc[sommet],s.sommetsRoDuBloc[sommet])
-            if not(currentPos == sommet and currentDeg == 0): # Est-il mal placé ? Si oui on l'envoie sur la 3e couronne avec Deg=1
+            if not(currentPos == sommet and currentDeg == 0): # Est-il mal placé ? Si oui on l'envoie sur la 3e couronne avec Deg=1 ou Deg=2
                 if currentPos in (0,1,2,3) and currentDeg==0: # Cas face blanche avec la bonne orientation
                     s.move(indicefacedroiteW(currentPos),3)
                     s.move(J,3)
