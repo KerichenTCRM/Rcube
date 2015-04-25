@@ -71,13 +71,17 @@ def genModeleEtape6 (couleurs): # Orientation et positionnement des arêtes de l
     (W,B,O,V,R,J) = couleurs
     return ",".join([ 9*W, 6*B+O+B+B, 8*O+J, 8*V+J, 8*R+J, B+J+V+3*J+R+J+J ])
 
+def genModeleEtape6B (couleurs): # Orientation et positionnement des arêtes de la face Jaune fait
+    """Génère une chaîne de caractères décrivant un cube pour les tests de l'étape 6"""
+    (W,B,O,V,R,J) = couleurs
+    return ",".join([ 9*W, 6*B+O+B+J, 6*O+V+O+B, 6*V+J+V+O, 6*R+J+R+J, B+J+V+3*J+R+J+R ])
+
 def genModeleEtape7 (couleurs): # Positionnement des sommets de la face Jaune faite
     """Génère une chaîne de caractères décrivant un cube juste avant l'étape 7"""
     (W,B,O,V,R,J) = couleurs
     return ",".join([9*W,\
                      6*B+R+B+O, 6*O+J+O+O, 9*V, 8*R+J,\
                                      J+J+B+J+J+J+J+J+B])
-
 
 def resoudreLeCube (description):
     """Cette fonction renvoie la liste des gestes à effectuer pour résoudre le cube d'après une chaine de caractère de la forme '*********,*********,*********,*********,*********,*********' ; chaque étoile correspondant à une lettre minuscule relative à la couleur de chaque facette.  """
