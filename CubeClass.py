@@ -389,7 +389,7 @@ class Cube:
         """Applique aux sommets du cube les changements que causent une rotation de la face de numéro fNum, de nbQuarts quarts de tours. """
         # On gère en même temps la position et la rotation
         # On établit d'abord une liste temporaire, indiquant un bloc, sa nouvelle position, et sa nouvelle rotation.
-        nbQuarts %= 4 # donc nbQuarts = 1,2 ou 3
+        nbQuarts # On a nbQuarts = 0,1,2 ou 3
         cycle = s.cyclesSommet[fNum]
         bloc_pos_ro_list = []
         for i in range(-4,0):
@@ -414,7 +414,7 @@ class Cube:
         """Applique aux arêtes du cube les changements que causent une rotation de la face de numéro fNum, de nbQuarts quarts de tours. """
         # On gère en même temps la position et la rotation
         # On établit d'abord une liste temporaire, indiquant un bloc, sa nouvelle position, et sa nouvelle rotation.
-        nbQuarts %= 4 # donc nbQuarts = 1,2 ou 3
+        nbQuarts # On a nbQuarts = 0,1,2 ou 3
         cycle = s.cyclesArete[fNum]
         addRo = s.diffRoAretes(fNum,nbQuarts)
         bloc_pos_ro_list = []
@@ -440,13 +440,14 @@ class Cube:
     def move (s,fNum,nbQuarts): # Finalement, il semble plus simple de n'utiliser que le numero des faces.
         """ Opère la rotation d'une des face du cube """
         couleurFace = s.couleurs[fNum]
-        if nbQuarts % 4 == 1:
+        nbQuarts %= 4
+        if nbQuarts == 1:
             action = "+"
-        elif nbQuarts % 4 == 3:
+        elif nbQuarts == 3:
             action = "-"
-        elif nbQuarts % 4 == 2:
+        elif nbQuarts == 2:
             action = "²"
-        else: # nbQuarts % 4 == 0
+        else: # nbQuarts == 0
             action = ''
             couleurFace = ''
         s.listeDesMouvements += couleurFace + action
@@ -747,28 +748,29 @@ class Cube:
         # 1) aucun sommet n'est à la bonne position. dans ce cas: 1 -> 2
         # 2) seule un sommet est la bonne position. Dans ce cas: 2 -> 3
         # 3) les quatres sommets sont correctemments placés 3 = OK ;)
-        # 
-        sommet = s.sommetsBlocALaPos[4:8]
+        #
+        s.printCube()
         estBienPlace = []
-        for i,val in enumerate(sommet):
-            if val == i+4:
+        for i in range(4,8):
+            if s.sommetsBlocALaPos[i] == i:
                 estBienPlace.append(i)
         compte = len(estBienPlace) # On compte le nombre de sommet bien placés
+
         if compte == 0: # Si aucun n'est bien placé, le seul cas possible est que les sommets soit chacun à l'opposé de leur position.
             s.coinsPermuPosJ(0,1)  # L'enchaînement de ces deux suites de mouvements
             s.coinsPermuPosJ(3,1) # Résoud la situation.
         
         if compte == 1: # Un unique sommet est bien placé
-            fixe = estBienPlace[0] % 4 # On trouve le sommet qui est bien place
-            suivant = (fixe + 1) % 4   # Le sommet suivant
-            oppose =  (fixe + 2) % 4   # Et le sommet encore après, afin de déterminer le sens du mouvement
-            sens = (1 if s.sommetsBlocALaPos[suivant] == oppose else -1) # On établi le sens de la permutation
-            s.coinsPermuPosJ(fixe-4,sens)
+            fixe = estBienPlace[0] % 4 + 4 # On trouve le sommet qui est bien place
+            suivant = (fixe + 1) % 4 + 4  # Le sommet suivant
+            oppose =  (fixe + 2) % 4 + 4  # Et le sommet encore après, afin de déterminer le sens du mouvement
+            sens = (1 if s.sommetsBlocALaPos[oppose] == suivant else -1) # On établi le sens de la permutation
+            s.coinsPermuPosJ(fixe,sens)
         
         if compte in [2,3]: # Il ne peut jamais y avoir exactement 2, ni 3 sommets bien positionnés.
             return "Erreur: Cube irrésolvable car mal remonté: imparité des positions sommets-arêtes."
         
-        compte = ([ sommet[i] == i + 4 for i in range(4)]) # On recompte le nombre de sommet bien placés
+        compte = sum([ s.sommetsBlocALaPos[i] == i for i in range(4,8)]) # On recompte le nombre de sommet bien placés
         if compte != 4: # Pour s'assurer que tout à bien fonctionné.
             return "Erreur lors du placement des sommets de la dernières face."
 
@@ -796,7 +798,6 @@ class Cube:
 
     def toutResoudre (s):
         """Fait la résolution complete du cube"""
-        # TODO, les valeurs dans étapes ne sont pas toutes correctes, notemment s.coinsDegJ
         etapes = [s.croixW, s.sommetsW, s.belge, s.petiteCroixJ, s.chaise, s.coinsPosJ, s.coinsDegJ]
         message = ""
         i = 0
