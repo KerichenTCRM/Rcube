@@ -661,7 +661,7 @@ class Cube:
             if s.aretesRoALaPos[8:]==[1,1,1,1]: #on traite le cas où le centre jaune est la seule facette jaune sur sa face
                 s.mvtligne(1)
             k=8    
-            while s.aretesRoALaPos[8:]!=[0,0,0,0] and k<12:  #on a alors forcément une configuration de type J ou ligne horizontale
+            while s.aretesRoALaPos[8:]!=[0,0,0,0]:  #on a alors forcément une configuration de type J ou ligne horizontale
                 if k!=11 and s.aretesRoALaPos[k]==0 and s.aretesRoALaPos[k+1]==0: #on cherche les config de type J
                     s.mvttypeJ(k-7,k-6)
                 elif k==11 and s.aretesRoALaPos[11]==0 and s.aretesRoALaPos[8]==0:
