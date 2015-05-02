@@ -89,6 +89,13 @@ def resoudreLeCube (description):
     cube = Cube(description)
     return cube.toutResoudre()
 
+def optimisation(L):
+    """créé plusieurs chaînes de caractères correspondant à une vision différente du cube à partir de la chaîne de départ fournie par l'utilisateur"""
+    L1=L[6]+L[3]+L[0]+L[7]+L[4]+L[1]+L[8]+L[5]+L[2]+","+L[20:49]+","+L[10:19]+","+L[52]+L[55]+L[58]+L[51]+L[54]+L[57]+L[50]+L[53]+L[56] #correspond à la description du cube avec W en haut et O en face de soi
+    L2=L[8::-1]+","+L[20:49]+","+L[10:19]+","+L[58:49:-1] #correspond à la description du cube avec W en haut et V en face de soi
+    L3=L[2]+L[5]+L[8]+L[1]+L[4]+L[7]+L[0]+L[3]+L[6]+","+L[40:49]+","+L[10:39]+","+L[56]+L[53]+L[50]+L[57]+L[54]+L[51]+L[58]+L[55]+L[52] #correspond à la description du cube avec W en haut et R en face de soi
+    L4=L[::-1] #correspond à la description du cube avec J en haut et R en face de soi
+    return ([L,L1,L2,L3,L4]) #n'hésitez pas à continuer
 ### Coeur du code ###
 # print(resoudreLeCube(sys.argv[-1]))
 #####################
