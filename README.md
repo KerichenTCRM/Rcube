@@ -110,16 +110,16 @@ Propositions de caratérisation des mouvements:
      + L'orientation des sommets [Rémy]
 
 #### Optimisation de l'algorithme
-* Améliorer le système de mémorisation des mouvements à faire pour pouvoir s'assurer que la liste finale ne contienne pas deux instructions consécutives de rotation d'une même face.
-     + Stocker les instructions sous forme de nombre dans deux tableaux lesNumerosDeFace et lesRotations (pour pouvoir sommer le rotations)
-     + La fonction memoMove doit comparer le numero de la face à tourner avec celui de la dernière face tournée, puis selon les cas :
+* Améliorer le système de mémorisation des mouvements pour pouvoir s'assurer que la liste finale ne contient pas deux instructions consécutives de rotation d'une même face.
+     + Stocker les instructions sous forme de nombre dans deux listes : lesNumerosDeFace et lesRotations (pour pouvoir sommer les rotations)
+     + La fonction memoMove doit comparer le numéro de la face à tourner avec celui de la dernière face tournée, puis selon les cas :
          - Ajouter le nouveau mouvement, et le nombre de rotation correspondant.
          - Ajouter uniquement les nombres de rotation entre eux.
          - Retirer le dernier mouvements.
-     + Une fonction finale doit générer la chaine de caractère réponse à partir de des deux listes numeroDeFace et nombreDeRotation.
+     + Une fonction finale doit générer la chaîne de caractère réponse à partir de des deux listes lesNumerosDeFace et lesRotation.
 * Proposer un affichage de la liste des mouvements mieux réfléchi
-     + Coder une fonction qui affiche les mouvements à faire un par un, en demandant à l'utilisateur d'appuier sur une touche (Entré ?) entre chaque. (un par un, je risque de me lasser d'appuier autant sur la touche. Quatre par quatre serai peut-être mieux ? [Mathieu])
+     + Coder une fonction qui affiche les mouvements à faire un par un, en demandant à l'utilisateur d'appuier sur une touche entre chaque (la touche entrée ?). (Si les mouvements sont affichés un par un, je risque de me lasser d'appuier  sur la touche. Quatre par quatre serai peut-être mieux ? [Mathieu])
      + (Proposition) Afficher des images pour indiquer la face et le sens de rotation correspondant
-     + (Proposition) Générer des images affichant l'état du cube, pour permettre à l'utilisateur de verifier le bon déroulement de la résolution de son cube.
+     + (Proposition - peu-probable) Générer des images affichant l'état du cube, pour permettre à l'utilisateur de verifier le bon déroulement de la résolution de son cube.
 * Optimiser le choix de la face par laquel commencer
-     + Faire les 6x4 = 24 résolutions possible du cube en prenant n'importe laquel des six faces pour première face, puis n'importe laquel des quatres faces mitoyenne pour deuxième face. Concerver la résolution qui fait le moins de coups.
+     + Faire les 6x4 = 24 résolutions possible du cube, en prenant n'importe laquel des six faces pour première face, puis n'importe laquel des quatres faces mitoyennes pour deuxième face. Concerver la résolution qui fait le moins de coups.
