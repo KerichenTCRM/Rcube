@@ -87,7 +87,13 @@ def genModeleEtape7 (couleurs): # Positionnement des sommets de la face Jaune fa
 def resoudreLeCube (description):
     """Cette fonction renvoie la liste des gestes à effectuer pour résoudre le cube d'après une chaine de caractère de la forme '*********,*********,*********,*********,*********,*********' ; chaque étoile correspondant à une lettre minuscule relative à la couleur de chaque facette.  """
     cube = Cube(description)
-    return cube.toutResoudre()
+    print(cube.toutResoudre())
+    L=cube.listeDesMouvements
+    k=0
+    while L[k:k+2]!="":
+        a=input("Faites entrer pour connaître le prochain geste à effectuer: ") #On donne les gestes à effectuer un par un pour plus de lisibilité
+        print(L[k:k+2])
+        k=k+2
 
 def optimisation(L):
     """créé plusieurs chaînes de caractères correspondant à une vision différente du cube à partir de la chaîne de départ fournie par l'utilisateur"""
