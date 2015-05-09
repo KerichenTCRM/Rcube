@@ -99,13 +99,16 @@ def resoudreEtapes (description):
     cube.toutResoudre()
     L=listeDesMouvementsoptimisée(cube.listeDesMouvements)
     A=""
+    u=0
     for k in range(0,len(L)-1,2):
         if L[k]!="*":
             A+=str(L[k])+str(L[k+1])+" "
         else:
-            print(A,len(A))
+            print(A,len(A)/3)
+            u+=(len(A)/3)
             A=""
             a=input("")
+    print(u)
         
 def listeDesMouvementsoptimisée(L):
         A=[]
