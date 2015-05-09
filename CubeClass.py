@@ -97,15 +97,29 @@ def resoudreEtapes (description):
     """donne la liste des mouvements à effectuer étapes par étapes"""
     cube = Cube(description)
     cube.toutResoudre()
-    L=cube.listeDesMouvements
+    L=listeDesMouvementsoptimisée(cube.listeDesMouvements)
     A=""
     for k in range(0,len(L)-1,2):
         if L[k]!="*":
-            A+=L[k:k+2]
+            A+=str(L[k])+str(L[k+1])+" "
         else:
             print(A,len(A))
             A=""
             a=input("")
+        
+def listeDesMouvementsoptimisée(L):
+        A=[]
+        for i in range(0,len(L)-1,2):
+            a=L[i]
+            b=L[i+1]
+            if A and a==A[-2] and b!="*" and A[-1]!="*":
+                b=(int(b)+int(A[-1]))%4
+                A.pop()
+                A.pop()
+            if b!=0:
+                A.append(a)
+                A.append(b)
+        return(A)
 
 def optimisation(L):
     """créé plusieurs chaînes de caractères correspondant à une vision différente du cube à partir de la chaîne de départ fournie par l'utilisateur"""
@@ -467,11 +481,11 @@ class Cube:
         couleurFace = s.couleurs[fNum]
         nbQuarts %= 4
         if nbQuarts == 1:
-            action = "+"
+            action = "1"
         elif nbQuarts == 3:
-            action = "-"
+            action = "3"
         elif nbQuarts == 2:
-            action = "²"
+            action = "2"
         else: # nbQuarts == 0
             action = ''
             couleurFace = ''
