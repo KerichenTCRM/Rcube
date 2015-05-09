@@ -91,7 +91,21 @@ def resoudreLeCube (description):
     L=cube.listeDesMouvements
     for k in range(0,len(L)-1,2):
         a=input("Faites entrer pour connaître le prochain geste à effectuer: ") #On donne les gestes à effectuer un par un 
-        print(L[k:k+2])    
+        print(L[k:k+2])  
+        
+def resoudreEtapes (description):
+    """donne la liste des mouvements à effectuer étapes par étapes"""
+    cube = Cube(description)
+    cube.toutResoudre()
+    L=cube.listeDesMouvements
+    A=""
+    for k in range(0,len(L)-1,2):
+        if L[k]!="*":
+            A+=L[k:k+2]
+        else:
+            print(A,len(A))
+            A=""
+            a=input("")
 
 def optimisation(L):
     """créé plusieurs chaînes de caractères correspondant à une vision différente du cube à partir de la chaîne de départ fournie par l'utilisateur"""
@@ -760,7 +774,7 @@ class Cube:
         # 2) seule un sommet est la bonne position. Dans ce cas: 2 -> 3
         # 3) les quatres sommets sont correctemments placés 3 = OK ;)
         #
-        s.printCube()
+        #s.printCube()
         estBienPlace = []
         for i in range(4,8):
             if s.sommetsBlocALaPos[i] == i:
@@ -815,6 +829,7 @@ class Cube:
         while not(message) and i < len(etapes):
             message = etapes[i]()
             i += 1
+            s.listeDesMouvements += "*"+"*"   # C'est la qu'il faut commenter pour enlever les * 
         if message:
             return message
         return s.listeDesMouvements
