@@ -618,6 +618,36 @@ class Cube:
         
         J = 5 # 5 est le numéro de la face jaune
         
+        if s.aretesPosDuBloc[4]==7 and s.aretesRoDuBloc[4]==0:
+            s.move(1,2)
+            s.move(J,2)
+            s.move(1,2)
+            s.move(J,2)
+            s.move(1,2)
+        
+        for k in range(4,6):
+            (currentPos,currentDeg) = (s.aretesPosDuBloc[k],s.aretesRoDuBloc[k])
+            if currentPos==k+2 and currentDeg==0:
+                s.move(k-1,2)
+                s.move(J,2)
+                s.move(k-1,2)
+                s.move(J,2)
+                s.move(k-1,2)
+                s.move(k-2,2)
+                s.move(J,2)
+                s.move(k-2,2)
+                s.move(J,2)
+                s.move(k-2,2)
+        
+        for k in range(4,7):
+            (currentPos,currentDeg) = (s.aretesPosDuBloc[k],s.aretesRoDuBloc[k])
+            if currentPos==k+1 and currentDeg==0:
+                s.move(k-2,2)
+                s.move(J,2)
+                s.move(k-2,2)
+                s.move(J,2)
+                s.move(k-2,2)
+        
         for k in range(4):
             arete = [4,5,6,7][k] # Les 4 blocs à déplacer.
             
