@@ -620,8 +620,7 @@ class Cube:
         
         # on essaie d'abord de se débarasser des cas simples
         for k in range(4,8):
-            (currentPos,currentDeg) = (s.aretesPosDuBloc[k],s.aretesRoDuBloc[k])
-            if currentPos==(k+2)%4+4 and currentDeg==0:
+            if s.aretesPosDuBloc[k]==(k+2)%4+4 and s.aretesRoDuBloc[k]==0 and (k!=7 or s.aretesPosDuBloc[4]!=4):
                 a=(k+2)%4+1
                 b=(a+2)%4+1
                 s.move(a,2)
@@ -635,18 +634,15 @@ class Cube:
                 s.move(J,2)
                 s.move(b,2)
         
-        for k in range(4,8):
-            if s.aretesPosDuBloc[k]==(k+3)%4+4 and s.aretesRoDuBloc[k]==0:
+            elif s.aretesPosDuBloc[k]==(k+3)%4+4 and s.aretesRoDuBloc[k]==0:
                 a=k-3
                 s.move(a,2)
                 s.move(J,2)
                 s.move(a,2)
                 s.move(J,2)
                 s.move(a,2)
-        
-        for k in range(4,8):
-            (currentPos,currentDeg) = (s.aretesPosDuBloc[k],s.aretesRoDuBloc[k])
-            if currentPos==(k+1)%4+4 and currentDeg==0:
+
+            elif s.aretesPosDuBloc[k]==(k+1)%4+4 and s.aretesRoDuBloc[k]==0:
                 a=(k+1)%4+1
                 s.move(a,2)
                 s.move(J,2)
