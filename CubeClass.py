@@ -618,35 +618,41 @@ class Cube:
         
         J = 5 # 5 est le numéro de la face jaune
         
-        if s.aretesPosDuBloc[4]==7 and s.aretesRoDuBloc[4]==0:
-            s.move(1,2)
-            s.move(J,2)
-            s.move(1,2)
-            s.move(J,2)
-            s.move(1,2)
-        
-        for k in range(4,6):
+        # on essaie d'abord de se débarasser des cas simples
+        for k in range(4,8):
             (currentPos,currentDeg) = (s.aretesPosDuBloc[k],s.aretesRoDuBloc[k])
-            if currentPos==k+2 and currentDeg==0:
-                s.move(k-1,2)
+            if currentPos==(k+2)%4+4 and currentDeg==0:
+                a=(k+2)%4+1
+                b=(a+2)%4+1
+                s.move(a,2)
                 s.move(J,2)
-                s.move(k-1,2)
+                s.move(a,2)
                 s.move(J,2)
-                s.move(k-1,2)
-                s.move(k-2,2)
+                s.move(a,2)
+                s.move(b,2)
                 s.move(J,2)
-                s.move(k-2,2)
+                s.move(b,2)
                 s.move(J,2)
-                s.move(k-2,2)
+                s.move(b,2)
         
-        for k in range(4,7):
+        for k in range(4,8):
+            if s.aretesPosDuBloc[k]==(k+3)%4+4 and s.aretesRoDuBloc[k]==0:
+                a=k-3
+                s.move(a,2)
+                s.move(J,2)
+                s.move(a,2)
+                s.move(J,2)
+                s.move(a,2)
+        
+        for k in range(4,8):
             (currentPos,currentDeg) = (s.aretesPosDuBloc[k],s.aretesRoDuBloc[k])
-            if currentPos==k+1 and currentDeg==0:
-                s.move(k-2,2)
+            if currentPos==(k+1)%4+4 and currentDeg==0:
+                a=(k+1)%4+1
+                s.move(a,2)
                 s.move(J,2)
-                s.move(k-2,2)
+                s.move(a,2)
                 s.move(J,2)
-                s.move(k-2,2)
+                s.move(a,2)
         
         for k in range(4):
             arete = [4,5,6,7][k] # Les 4 blocs à déplacer.
