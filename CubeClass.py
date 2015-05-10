@@ -2,87 +2,73 @@
 # -*- coding: utf-8 -*-
 # Résolveur de Rubik's Cube
 import sys
+import copy
 
 # Génération de modèle, pour les tests de bon fonctionnement.
-def genCouleurs ():
-    return ['w', 'b', 'o', 'v', 'r', 'j']
+couleurs = ['w', 'b', 'o', 'v', 'r', 'j']
+(W,B,O,V,R,J) = couleurs
+ 
+# Chaîne de caractère décrivant un cube résolu.
+modeleResolu = ",".join([ 9*clr for clr in couleurs])
 
-def genModeleResolu (couleurs):
-    """Génère une chaîne de caractère décrivant un cube résolu."""
-    return ",".join([ 9*laCouleur for laCouleur in couleurs])
-
-def genModeleA (couleurs):
-    """Génère une chaîne de caractères décrivant un cube dont les deux premières couronnes sont résolues"""
-    (W,B,O,V,R,J) = couleurs
-    return ",".join([9*W,\
+# Chaîne de caractères décrivant un cube dont les deux premières couronnes sont résolues
+modeleA = ",".join([9*W,\
     6*B+J+B+R, 6*O+J+R+R, 6*V+B+O+O, 6*R+J+V+V,\
     B+J+O+J+J+J+J+J+V])
-    
-def genModeleB (couleurs):
-    """Génère une chaîne de caractères décrivant un cube particulier, mais non résolu."""
-    (W,B,O,V,R,J) = couleurs
-    return ",".join([O+W+W+W+W+W+W+W+R,\
-                     B+B+V+B+B+J+B+R+B, J+O+O+B+O+O+W+O+O, V+V+B+V+V+J+V+O+V, J+R+R+V+R+R+W+R+R,\
-                                                                              R+J+J+B+J+V+J+J+O])
-    
-def genModeleC (couleurs):
-    """Génère une chaîne de caractères décrivant un cube particulier, mais non résolu."""
-    (W,B,O,V,R,J) = couleurs
-    return ",".join([R+J+W+J+W+J+W+J+O,\
-                     V+B+B+B+B+W+V+R+V, J+O+R+B+O+O+W+O+R, B+V+V+V+V+W+B+O+B, J+R+O+V+R+R+W+R+O,\
-                                                                              O+W+J+B+J+V+J+W+R])
 
-def genModeleEtape1 (couleurs): # Complètement mélangé
-    """Génère une chaîne de caractères décrivant un cube juste avant l'étape 1"""
-    (W,B,O,V,R,J) = couleurs
-    return ",".join([J+R+V+W+W+O+W+B+J,\
-                     O+W+B+J+B+W+R+V+W, R+B+J+R+O+V+V+R+V, R+B+O+J+V+J+J+V+W, B+O+B+O+R+B+R+O+B,\
-                                                                              V+V+W+W+J+R+O+J+O])
+# Chaîne de caractères décrivant un cube particulier, mais non résolu.
+modeleB = ",".join([O+W+W+W+W+W+W+W+R,\
+B+B+V+B+B+J+B+R+B, J+O+O+B+O+O+W+O+O, V+V+B+V+V+J+V+O+V, J+R+R+V+R+R+W+R+R,\
+                                                          R+J+J+B+J+V+J+J+O])
 
-def genModeleEtape2 (couleurs): # Croix blanche faite
-    """Génère une chaîne de caractères décrivant un cube pour les tests de l'étape 2"""
-    (W,B,O,V,R,J) = couleurs
-    return ",".join([R+W+R+W+W+W+R+W+J,\
-                     B+B+O+J+B+B+O+B+J, B+O+W+O+O+R+V+R+O, V+V+B+V+V+R+B+J+O, W+R+J+B+R+V+W+O+J,\
-                                                                              V+V+V+O+J+J+W+J+R])
+# Chaîne de caractères décrivant un cube particulier, mais non résolu.
+modeleC = ",".join([R+J+W+J+W+J+W+J+O,\
+V+B+B+B+B+W+V+R+V, J+O+R+B+O+O+W+O+R, B+V+V+V+V+W+B+O+B, J+R+O+V+R+R+W+R+O,\
+                                                          O+W+J+B+J+V+J+W+R])
 
-def genModeleEtape3 (couleurs): # Face blanche faite
-    """Génère une chaîne de caractères décrivant un cube pour les tests de l'étape 3 """
-    (W,B,O,V,R,J) = couleurs
-    return ",".join([9*W,\
-                     3*B+B+B+B+J+O+O, 3*O+R+O+V+J+R+B, 3*V+O+V+J+J+R+V, 3*R+B+R+O+R+J+V,\
-                                                                       J+V+O+V+J+J+R+J+B])
+# Chaîne de caractères décrivant un cube juste avant l'étape 1
+# Complètement mélangé
+modeleEtape1 = ",".join([J+R+V+W+W+O+W+B+J,\
+O+W+B+J+B+W+R+V+W, R+B+J+R+O+V+V+R+V, R+B+O+J+V+J+J+V+W, B+O+B+O+R+B+R+O+B,\
+                                                          V+V+W+W+J+R+O+J+O])
 
-def genModeleEtape4 (couleurs): # Deuxième couronne faite
-    """Génère une chaîne de caractères décrivant un cube pour les tests de l'étape 4"""
-    (W,B,O,V,R,J) = couleurs
-    return ",".join([9*W,\
+# Chaîne de caractères décrivant un cube pour les tests de l'étape 2
+# Croix blanche faite
+modeleEtape2 = ",".join([R+W+R+W+W+W+R+W+J,\
+B+B+O+J+B+B+O+B+J, B+O+W+O+O+R+V+R+O, V+V+B+V+V+R+B+J+O, W+R+J+B+R+V+W+O+J,\
+                                                          V+V+V+O+J+J+W+J+R])
+
+# Chaîne de caractères décrivant un cube pour les tests de l'étape 3 
+# Face blanche faite
+modeleEtape3 = ",".join([9*W,\
+3*B+B+B+B+J+O+O, 3*O+R+O+V+J+R+B, 3*V+O+V+J+J+R+V, 3*R+B+R+O+R+J+V,\
+                                                  J+V+O+V+J+J+R+J+B])
+
+# Chaîne de caractères décrivant un cube pour les tests de l'étape 4
+# Deuxième couronne faite
+modeleEtape4 = ",".join([9*W,\
                      6*B+B+J+B, 6*O+O+J+V, 6*V+J+O+J, 6*R+V+B+R,\
                                                R+J+J+J+J+R+O+V+J])
 
-def genModeleEtape5 (couleurs): # Orientation des arêtes de la face Jaune faite
-    """Génère une chaîne de caractères décrivant un cube pour les tests de l'étape 5"""
-    (W,B,O,V,R,J) = couleurs
-    return ",".join([9*W,\
+# Chaîne de caractères décrivant un cube pour les tests de l'étape 5
+# Orientation des arêtes de la face Jaune faite
+modeleEtape5 = ",".join([9*W,\
                      6*B+O+O+J, 6*O+V+R+J, 6*V+R+B+J, 6*R+O+V+B,\
                                                     V+5*J+B+J+R])
 
-def genModeleEtape6 (couleurs): # Orientation et positionnement des arêtes de la face Jaune fait
-    """Génère une chaîne de caractères décrivant un cube pour les tests de l'étape 6"""
-    (W,B,O,V,R,J) = couleurs
-    return ",".join([ 9*W, 6*B+O+B+B, 8*O+J, 8*V+J, 8*R+J, B+J+V+3*J+R+J+J ])
+# Chaîne de caractères décrivant un cube pour les tests de l'étape 6
+# Orientation et positionnement des arêtes de la face Jaune fait
+modeleEtape6 = ",".join([ 9*W, 6*B+O+B+B, 8*O+J, 8*V+J, 8*R+J, B+J+V+3*J+R+J+J ])
 
-def genModeleEtape6B (couleurs): # Orientation et positionnement des arêtes de la face Jaune fait
-    """Génère une chaîne de caractères décrivant un cube pour les tests de l'étape 6"""
-    (W,B,O,V,R,J) = couleurs
-    return ",".join([ 9*W, 6*B+O+B+J, 6*O+V+O+B, 6*V+J+V+O, 6*R+J+R+J, B+J+V+3*J+R+J+R ])
+# Chaîne de caractères décrivant un cube pour les tests de l'étape 6
+# Orientation et positionnement des arêtes de la face Jaune fait
+modeleEtape6B = ",".join([ 9*W, 6*B+O+B+J, 6*O+V+O+B, 6*V+J+V+O, 6*R+J+R+J, B+J+V+3*J+R+J+R ])
 
-def genModeleEtape7 (couleurs): # Positionnement des sommets de la face Jaune faite
-    """Génère une chaîne de caractères décrivant un cube juste avant l'étape 7"""
-    (W,B,O,V,R,J) = couleurs
-    return ",".join([9*W,\
-                     6*B+R+B+O, 6*O+J+O+O, 9*V, 8*R+J,\
-                                     J+J+B+J+J+J+J+J+B])
+# Chaîne de caractères décrivant un cube juste avant l'étape 7
+# Positionnement des sommets de la face Jaune faite
+modeleEtape7 = ",".join([9*W,\
+                   6*B+R+B+O, 6*O+J+O+O, 9*V, 8*R+J,\
+                                   J+J+B+J+J+J+J+J+B])
 
 def resoudreLeCube (description):
     """Cette fonction renvoie la liste des gestes à effectuer pour résoudre le cube d'après une chaine de caractère de la forme '*********,*********,*********,*********,*********,*********' ; chaque étoile correspondant à une lettre minuscule relative à la couleur de chaque facette.  """
@@ -90,7 +76,7 @@ def resoudreLeCube (description):
     print(cube.toutResoudre())
     L=cube.listeDesMouvements
     for k in range(0,len(L)-1,2):
-        a=input("Faites entrer pour connaître le prochain geste à effectuer: ") #On donne les gestes à effectuer un par un 
+        a=input("Faites entrer pour connaître le prochain geste à effectuer: ") # On donne les gestes à effectuer un par un 
         print(L[k:k+2])  
         
 def resoudreEtapes (description):
@@ -136,6 +122,13 @@ def optimisation(L):
 #####################
 
 
+def afficheur (text):
+    qt = 4
+    liste = [text[i:i+2] for i in range(0,len(text),2)]
+    for i in range(0,len(liste),qt):
+        input('  ' + " ".join(liste[i:i+qt]))
+
+
 
 class Cube:
     #W = "w" # 0 # Dessus [W-J Axe 0]
@@ -165,6 +158,10 @@ class Cube:
 
         ### Initialilisation de la liste des mouvements : celle que renverra l'algorithme:
         s.listeDesMouvements = ""
+        s.listeMvtRotations = ['']
+        s.listeMvtFaces = ['']
+        s.syntheseDesMvts = ""
+        s.decompte = 0
 
         ### Données figées, éguales pour toutes les instances:
         s.sommetsPosParitee = [0,1,0,1,1,0,1,0]
@@ -186,10 +183,11 @@ class Cube:
         s.v = (lambda a,b : 2**a+2**b) # v comme valeur
         v = s.v
         s.retrouverNumeroArete = {
-        v(W,W): -1, v(W,B):  0, v(W,O):  1, v(W,V):  2, v(W,R):  3, v(W,J): -2, # Cas Blancs
-        v(J,J): -1, v(J,B):  8, v(J,O):  9, v(J,V): 10, v(J,R): 11, # Cas Jaunes non-blancs
+        v(W,B):  0, v(W,O):  1, v(W,V):  2, v(W,R):  3, # Cas Blancs
+        v(J,B):  8, v(J,O):  9, v(J,V): 10, v(J,R): 11, # Cas Jaunes
         v(B,O):  4, v(O,V):  5, v(V,R):  6, v(R,B):  7, # Cas de la `couronne_milieu`
-        v(B,B): -1, v(O,O): -1, v(V,V): -1, v(R,R): -1, v(B,V): -2, v(O,R): -2 # Autres cas, les erreurs
+        v(W,W): -1, v(B,B): -1, v(O,O): -1, v(V,V): -1, v(R,R): -1, v(J,J): -1,
+        v(W,J): -2, v(B,V): -2, v(O,R): -2
         } # -1 est une erreur: deux fois la même couleur 
           # -2 est une erreur: couleurs de faces opposées
           # Remarque: nous sommes sur d'avoir énuméré toutes les possibilités, car
@@ -214,7 +212,7 @@ class Cube:
                          [1,2,6,5], # 3: V
                          [2,3,7,6], # 4: R
                          [4,5,6,7]] # 5: J
-                         
+        
         s.cyclesArete = [[0,3,2,1], # Rotation de la face 0 : W : Blanche
                         [0,4,8,7], # 1: B
                         [1,5,9,4], # 2: O
@@ -254,6 +252,13 @@ class Cube:
         s.groupAretes()
         s.mapSommets()
         s.mapAretes()
+
+        s.sommeRoAretes = sum(s.aretesRoALaPos)
+        s.sommeRoSommets = sum(s.sommetsRoALaPos)
+        if s.sommeRoAretes % 2 != 0:
+            raise AssertionError("Somme des degrés des arêtes impaire!")
+        if s.sommeRoSommets % 3 != 0:
+            raise AssertionError("Somme des degrés des sommets erronnée!")
         
         # Fin de __init__
         #(FIN DE __init__!)
@@ -271,13 +276,13 @@ class Cube:
         #"s.aretesPosDuBloc = {}".format(s.aretesPosDuBloc),
         #"s.aretesRoDuBloc = {}".format(s.aretesRoDuBloc),
         
-        "s.listeDesMouvements = {}".format(s.listeDesMouvements)
+        "s.listeDesMouvements = {}".format(s.listeDesMouvements),
+        "s.syntheseDesMvts    = {}".format(s.syntheseDesMvts),
         ])
      
     def printCube (s):
         """Affiche l'état du cube"""
         print( s.decrireCube() )
-     
      
 # Numérotation arbitraire des sommets:
 # 2 . 1                   
@@ -288,7 +293,8 @@ class Cube:
 # 7 . 4 4 . 5 5 . 6 6 . 7 
 #                   6 . 7 
 #                   . J . 
-#                   5 . 4 
+#                   5 . 4
+
     def identifieSommet (s,bloc3f):
         """ Caractérise un sommet du cube, à partir de trois couleurs d'un bloc.""" 
         # bloc3f contient trois couleurs: trois facettes
@@ -348,7 +354,7 @@ class Cube:
                 if x == s.B or x == s.V:
                     orientation = i
         if orientation == 2: # Si l'orientation n'est toujours pas déterminée, c'est qu'il y a une erreur.
-            return "Erreur (d'orientation) d'arête dans la description du cube"
+            raise AssertionErreur(" L'orientation des arêtes n'a pas pu être déterminée ")
         return (num,orientation)
 
 
@@ -431,7 +437,7 @@ class Cube:
         """Applique aux sommets du cube les changements que causent une rotation de la face de numéro fNum, de nbQuarts quarts de tours. """
         # On gère en même temps la position et la rotation
         # On établit d'abord une liste temporaire, indiquant un bloc, sa nouvelle position, et sa nouvelle rotation.
-        nbQuarts # On a nbQuarts = 0,1,2 ou 3
+        # On a nbQuarts = 0,1,2 ou 3
         cycle = s.cyclesSommet[fNum]
         bloc_pos_ro_list = []
         for i in range(-4,0):
@@ -456,7 +462,7 @@ class Cube:
         """Applique aux arêtes du cube les changements que causent une rotation de la face de numéro fNum, de nbQuarts quarts de tours. """
         # On gère en même temps la position et la rotation
         # On établit d'abord une liste temporaire, indiquant un bloc, sa nouvelle position, et sa nouvelle rotation.
-        nbQuarts # On a nbQuarts = 0,1,2 ou 3
+        # On a nbQuarts = 0,1,2 ou 3
         cycle = s.cyclesArete[fNum]
         addRo = s.diffRoAretes(fNum,nbQuarts)
         bloc_pos_ro_list = []
@@ -478,11 +484,120 @@ class Cube:
         """ Applique aux blocs du cube les changements que causent une rotation de la face de numéro fNum, de nbQuarts quarts de tours. """
         s.rotationSommets(fNum,nbQuarts)
         s.rotationAretes(fNum,nbQuarts)
-        
+
+    def tournerCube (s):
+        cube = copy.deepcopy(s)
+        cube.viSommets = []
+        cube.viAretes = []
+        # Déplacement des sommets et arêtes extérieurs
+        cube.rotationFace(s,0,1) # Face blanche
+        cube.rotationFace(s,5,3) # Face jaune
+        # Déplacement des centres:
+        c = cube.couleurs
+        cube.couleurs = c[0]+c[2:5]+c[1]+c[5]
+        # Dépacements des arêtes restantes:
+        cycle = [7,6,5,4]
+        bloc_pos_ro_list = []
+        for i in range(-4,0):
+            oldPos = cycle[i]
+            newPos = cycle[i+1]
+            bloc = s.aretesBlocALaPos[oldPos]
+            oldRo = s.aretesRoALaPos[oldPos]
+            newRo = (oldRo + 1) % 2 # Changement de polarité, pour les centres des faces.
+            bloc_pos_ro_list.append( (bloc,newPos,newRo) )
+        # Puis on applique ces valeurs:
+        for bloc,pos,ro in bloc_pos_ro_list:
+            s.aretesPosDuBloc[bloc] = pos
+            s.aretesBlocALaPos[pos] = bloc
+            s.aretesRoDuBloc[bloc] = ro
+            s.aretesRoALaPos[pos] = ro            
+        # Les couleurs polaires de second ordre sont désormais le orange et le rouge, plutôt que le bleu et le vert.
+        # Changement de polarité, pour les blocs concernés:
+        for num in cycle: # On sélectionne les blocs selon leur numéro
+            pos = s.aretesPosDuBloc[num]
+            ro = (s.aretesRoAlaPos[pos]+1) % 2
+            s.aretesRoDuBloc[num] = ro
+            s.aretesRoAlaPos[pos] = ro
+        # TODO: Changement de rotation pour les sommets
+        groupe1 = [0,5,2,7]
+        groupe2 = [4,1,6,3]
+
+    def basculerCube (s):
+        cube = copy.deepcopy(s)
+        cube.viSommets = []
+        cube.viAretes = []
+        # Déplacement des sommets et arêtes extérieurs
+        cube.rotationFace(s,4,1) # Face rouge
+        cube.rotationFace(s,2,3) # Face oragne
+        # Déplacement des centres:
+        c = cube.couleurs
+        cube.couleurs = c[3]+c[0]+c[2]+c[5]+c[4]+c[1]
+        # Dépacements des arêtes restantes:
+        cycle = [0,8,11,2]
+        bloc_pos_ro_list = []
+        for i in range(-4,0):
+            oldPos = cycle[i]
+            newPos = cycle[i+1]
+            bloc = s.aretesBlocALaPos[oldPos]
+            oldRo = s.aretesRoALaPos[oldPos]
+            newRo = (oldRo + 1) % 2 # Changement de polarité, pour les centres des faces.
+            bloc_pos_ro_list.append( (bloc,newPos,newRo) )
+        # Puis on applique ces valeurs:
+        for bloc,pos,ro in bloc_pos_ro_list:
+            s.aretesPosDuBloc[bloc] = pos
+            s.aretesBlocALaPos[pos] = bloc
+            s.aretesRoDuBloc[bloc] = ro
+            s.aretesRoALaPos[pos] = ro            
+        # Les couleurs polaires de second ordre sont désormais le orange et le rouge, plutôt que le bleu et le vert.
+        # Changement de polarité, pour les blocs concernés:
+        for num in cycle: # On sélectionne les blocs selon leur numéro
+            pos = s.aretesPosDuBloc[num]
+            ro = (s.aretesRoAlaPos[pos]+1) % 2
+            s.aretesRoDuBloc[num] = ro
+            s.aretesRoAlaPos[pos] = ro
+        # TODO: Changement de rotation pour les sommets
+    
+    def memMove (s,fNum,nbQuarts):
+        """Ajoute (intelligemment) le mouvement donné, à la liste totalisants les mouvements utilisés"""
+        # On compare le mouvement à ajouter au dernier muvement effectué, pour savoir si on peut les combinner
+        if fNum == s.listeMvtFaces[-1]: # On tourne deux fois la même face d'affilier: optimisation:
+            roTot = ( s.listeMvtRotations[-1] + nbQuarts ) % 4
+            if roTot == 0: # Les mouvements s'annules!
+                s.listeMvtFaces.pop()
+                s.listeMvtRotations.pop()
+            else: # Les mouvements se combinnent:
+                s.listeMvtRotations[-1] = roTot
+        else: # On ajoute simplement les mouvement à la liste.
+            s.listeMvtFaces.append(fNum)
+            s.listeMvtRotations.append(nbQuarts)        
+
+    def genListe (s):
+        """Génère la liste (chaine) des mouvements à effectuer pour finir le cube"""
+        s.syntheseDesMvts = ""
+        s.decompte = len(s.listeMvtFaces)-1
+        if s.decompte != len(s.listeMvtRotations)-1:
+            raise AssertionError("Erreur dans la memorisation des mouvements: len(s.listeMvtFaces) == {} != {} == len(s.listeMvtRotations)".format(len(s.listeMvtFaces),len(s.listeMvtRotations)))
+        for i in range(1,s.decompte+1): #! on ignore le premier élément, c.f. initialisation des listes
+            nbQuarts = s.listeMvtRotations[i]
+            if nbQuarts == 1:
+                action = "+"
+            elif nbQuarts == 2:
+                action = "²"
+            elif nbQuarts == 3:
+                action = "-"
+            else: # nbQuarts == 0 
+                raise AssertionError("Rotation nulle trouvée dans listeMvtRotations à l'indice {}.".format(i))
+            s.syntheseDesMvts += s.couleurs[s.listeMvtFaces[i]] + action
+            
+    
     def move (s,fNum,nbQuarts): # Finalement, il semble plus simple de n'utiliser que le numero des faces.
         """ Opère la rotation d'une des face du cube """
-        couleurFace = s.couleurs[fNum]
         nbQuarts %= 4
+        if nbQuarts != 0:
+            s.memMove(fNum,nbQuarts)
+            s.rotationFace(fNum,nbQuarts)
+        
+        couleurFace = s.couleurs[fNum]
         if nbQuarts == 1:
             action = "1"
         elif nbQuarts == 3:
@@ -493,7 +608,6 @@ class Cube:
             action = ''
             couleurFace = ''
         s.listeDesMouvements += couleurFace + action
-        s.rotationFace(fNum,nbQuarts)
         
     def act (s,action):
         """ Tourne une face, spécifiée selon le code convention-utilisateur """
@@ -513,8 +627,7 @@ class Cube:
         """Applique la série de mouvements donnée (selon la convention utilisateur)"""
         for i in range(0, len(instruction), 2):
             s.act(instruction[i:i+2])
-    
-    
+
     ## Réalisation du cube, étape par étape ##
     ## Etape 1: Les arêtes de la première face ##
     def croixW(s):
@@ -869,16 +982,23 @@ class Cube:
                 
                 currentDeg = s.sommetsRoDuBloc[sommet]
 
-
     def toutResoudre (s):
         """Fait la résolution complete du cube"""
-        etapes = [s.croixW, s.sommetsW, s.belge, s.petiteCroixJ, s.chaise, s.coinsPosJ, s.coinsDegJ]
+        etapes = [s.croixW, s.sommetsW, s.belge, s.petiteCroixJ, s.chaise, s.coinsPosJ, s.coinsDegJ, s.genListe]
         message = ""
         i = 0
         while not(message) and i < len(etapes):
             message = etapes[i]()
             i += 1
-            s.listeDesMouvements += "*"+"*"   # C'est la qu'il faut commenter pour enlever les * 
+            # s.listeDesMouvements += "**"  # Commentez cette ligne pour enlever les * 
         if message:
             return message
         return s.listeDesMouvements
+
+
+stri = modeleEtape1
+s = Cube(stri)
+s.printCube()
+print()
+s.toutResoudre()
+s.printCube()
