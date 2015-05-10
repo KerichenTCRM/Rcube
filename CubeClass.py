@@ -278,6 +278,7 @@ class Cube:
         
         "s.listeDesMouvements = {}".format(s.listeDesMouvements),
         "s.syntheseDesMvts    = {}".format(s.syntheseDesMvts),
+        "s.decompte = {}".format(s.decompte),
         ])
      
     def printCube (s):
@@ -990,15 +991,7 @@ class Cube:
         while not(message) and i < len(etapes):
             message = etapes[i]()
             i += 1
-            # s.listeDesMouvements += "**"  # Commentez cette ligne pour enlever les * 
+            s.listeDesMouvements += "**"  # Commentez cette ligne pour enlever les * 
         if message:
             return message
         return s.listeDesMouvements
-
-
-stri = modeleEtape1
-s = Cube(stri)
-s.printCube()
-print()
-s.toutResoudre()
-s.printCube()
