@@ -45,7 +45,7 @@ Le projet RCube, réalisé par quatre étudiants de première année de classe p
         4 5 6
         7 8 9
 ## Appel de l'algorithme
-L'algorithme, codé en python, recevra un argument: une chaine de caractères de 59 caractères: six groupes de 9 caractères, séparés par des virgules. A chaque couleur de facette, l'utilisateur associera une lettre (ou un nombre). Chaque groupe de neuf caractères correspondra aux couleurs des facettes d'une face.
+L'algorithme, codé en python, recevra un argument: une chaine de caractères de 59 caractères: six groupes de 9 caractères, séparés par des virgules (6*9 + 5 = 59). A chaque couleur de facette, l'utilisateur associera une lettre (ou un nombre). Chaque groupe de neuf caractères correspondra aux couleurs des facettes d'une face.
 
 #### Exemples
 Entièrement défait:
@@ -57,6 +57,9 @@ Avec les deux premières couronnes de faites:
 
 ## Sortie de l'algorithme
 La réponse, en sortie de l'algorithme, sera une liste de mouvements.
+* + signifie une rotation de sens horaire.
+* - signifie une rotation de sens anti-horaire.
+* ² signifie une rotation de 180° (un demi-tour).
 
 ## Caractérisation pratique du cube
 Propositions de caratérisation du cube:
@@ -87,7 +90,7 @@ Propositions de caratérisation des mouvements:
 
         Avantage: manipulation facile pour l'utilisateur
 
-* Par un des 12 mouvements et une référence (face devant et dessus): [ Utilisé dans le code ]
+* Par un des 12 mouvements et une référence (face devant et dessus): [ Finalement inutilisé. ]
         
         Avantage: similaire au langage utilisé lors de l'apprentissage de la résolution
         Inconvénient: nécessite une référence
@@ -96,7 +99,7 @@ Propositions de caratérisation des mouvements:
 * Fonction de rotation, opérant avec la couleur du centre à tourner, et le nombre de quart de tour à effectuer.
      + Tableau, spécifiant pour chaque quart de tour d'une face, les positions dont les blocs sont déplacés, et la nouvelle position associée. (Un tableau pour les arêtes, et un pour les sommets) [Rémy]
      + Fonction déterminant l'orientation des blocs, après la rotation de la face. [Mathieu]
-* [Ne sera probablement pas fait] Modèle abstrait, permettant "choisir" une des quatres faces du cube comme face de travail, on identifie alors les faces: { t: de travail, d: droite, g: gauche, et o: opposée }.
+* [N'a pas été fait, ni utilisé] Modèle abstrait, permettant "choisir" une des quatres faces du cube comme face de travail, on identifie alors les faces: { t: de travail, d: droite, g: gauche, et o: opposée }.
 
 #### Manipulation du cube:
 * Première face et première couronne:
@@ -110,7 +113,7 @@ Propositions de caratérisation des mouvements:
      + L'orientation des sommets [Rémy]
 
 #### Optimisation de l'algorithme
-* Améliorer le système de mémorisation des mouvements pour pouvoir s'assurer que la liste finale ne contient pas deux instructions consécutives de rotation d'une même face.
+* Améliorer le système de mémorisation des mouvements pour pouvoir s'assurer que la liste finale ne contient pas deux instructions consécutives de rotation d'une même face. [fait]
      + Stocker les instructions sous forme de nombre dans deux listes : lesNumerosDeFace et lesRotations (pour pouvoir sommer les rotations)
      + La fonction memoMove doit comparer le numéro de la face à tourner avec celui de la dernière face tournée, puis selon les cas :
          - Ajouter le nouveau mouvement, et le nombre de rotation correspondant.
@@ -122,4 +125,4 @@ Propositions de caratérisation des mouvements:
      + (Proposition) Afficher des images pour indiquer la face et le sens de rotation correspondant
      + (Proposition - peu-probable) Générer des images affichant l'état du cube, pour permettre à l'utilisateur de verifier le bon déroulement de la résolution de son cube.
 * Optimiser le choix de la face par laquel commencer
-     + Faire les 6x4 = 24 résolutions possible du cube, en prenant n'importe laquel des six faces pour première face, puis n'importe laquel des quatres faces mitoyennes pour deuxième face. Concerver la résolution qui fait le moins de coups.
+     + Faire les 6x4 = 24 résolutions possible du cube, en prenant n'importe laquel des six faces pour première face, puis n'importe laquel des quatres faces mitoyennes pour deuxième face. Concerver la résolution qui fait le moins de coups. [fait]
