@@ -73,7 +73,7 @@ modeleEtape7 = ",".join([9*W,\
 def resoudreLeCube (description):
     """Cette fonction renvoie la liste des gestes à effectuer pour résoudre le cube d'après une chaine de caractère de la forme '*********,*********,*********,*********,*********,*********' ; chaque étoile correspondant à une lettre minuscule relative à la couleur de chaque facette.  """
     cube = Cube(description)
-    print(cube.toutResoudre())
+    print(cube.resolutionComplete())
     L=cube.listeDesMouvements
     for k in range(0,len(L)-1,2):
         a=input("Faites entrer pour connaître le prochain geste à effectuer: ") # On donne les gestes à effectuer un par un 
@@ -82,7 +82,7 @@ def resoudreLeCube (description):
 def resoudreEtapes (description):
     """donne la liste des mouvements à effectuer étapes par étapes"""
     cube = Cube(description)
-    cube.toutResoudre()
+    cube.resolutionComplete()
     L=listeDesMouvementsoptimisée(cube.listeDesMouvements)
     A=""
     u=0
@@ -121,13 +121,29 @@ def optimisation(L):
 # print(resoudreLeCube(sys.argv[-1]))
 #####################
 
+def interactionUtilisateur (description = sys.argv[-1]):
+    """Cette fonction doit être executée pour faire fonction le programme"""
+    # Obtention de la meilleur solution:
+    cube = Cube(description).resolution24()
+    # Affichage
+    print("Resolution en {} mouvements, en commençant par la face {}, (::{}::)".format(cube.decompte,cube.couleurs[0],cube.couleurs[1]))
+    afficheur(cube.syntheseDesMvts)
 
-def afficheur (text):
-    qt = 4
-    liste = [text[i:i+2] for i in range(0,len(text),2)]
+def afficheur (texte, qt = 4):
+    """Affiche par groupe de `qt`, les couples de caractères pris dans le texte."""
+    liste = [texte[i:i+2] for i in range(0,len(texte),2)]
     for i in range(0,len(liste),qt):
         input('  ' + " ".join(liste[i:i+qt]))
 
+def picMin (liste):
+    """Compare les éléments de la liste, et renvoie l'indice du minimum"""
+    minim = liste[0]
+    iMin = 0
+    for i,val in enumerate(liste):
+        if val < minim:
+            iMin = i
+            minim = val
+    return iMin
 
 
 class Cube:
@@ -137,7 +153,7 @@ class Cube:
     #V = "v" # 3 # Derrière
     #R = "r" # 4 # A gauche
     #J = "j" # 5 # Dessous
-        
+    
     def __init__ (s, chaineU):
         
         ### Données figées, égales pour toutes les instances:
@@ -223,10 +239,9 @@ class Cube:
         
         # La facette n°4 (le centre) définit la couleur de la face :
         s.couleurs = [ face[4] for face in s.faces ]      # Le quatrième caractère est le centre de la face.
-        s.creerCorrespondanceCouleurs() # correspondance nom-couleur, et numéro-couleur :
-       # (s.W, s.B, s.O, s.V, s.R, s.J) = s.couleurs       # Nous affectons des noms spécifique à chaque couleur.
-        # s.numeroDeCouleur = { s.W: 0, s.B: 1, s.O: 2, s.V: 3, s.R: 4, s.J: 5} # Correspondance inverse couleur-nombre.
+        s.creerCorrespondanceCouleurs() # correspondance nom-couleur, et numéro-couleur
         (s.Wf, s.Bf, s.Of, s.Vf, s.Rf, s.Jf) = s.faces    # Nous affectons aussi des noms à chaque face.
+        
         ## Définition des tableaux anneauHaut, anneauBas, couronneHaut, couronneMil et couronneBas
         # Notion d'anneau (haut et bas) correspond à une lecture particulière des faces :
         # 5 4 3
@@ -260,6 +275,7 @@ class Cube:
      
     def printCube (s):
         """Affiche l'état du cube"""
+        s.genListe()
         print("\n".join([
         "s.sommetsBlocALaPos = {}".format(s.sommetsBlocALaPos),
         "s.sommetsRoALaPos   = {}".format(s.sommetsRoALaPos),
@@ -271,7 +287,7 @@ class Cube:
         #"s.aretesPosDuBloc = {}".format(s.aretesPosDuBloc),
         #"s.aretesRoDuBloc  = {}".format(s.aretesRoDuBloc),
         
-        "s.listeDesMouvements = {}".format(s.listeDesMouvements),
+        #"s.listeDesMouvements = {}".format(s.listeDesMouvements),
         "s.syntheseDesMvts    = {}".format(s.syntheseDesMvts),
         "s.decompte = {}".format(s.decompte),
         ]))
@@ -674,7 +690,7 @@ class Cube:
     
     def memMove (s,fNum,nbQuarts):
         """Ajoute (intelligemment) le mouvement donné, à la liste totalisants les mouvements utilisés"""
-        # On compare le mouvement à ajouter au dernier muvement effectué, pour savoir si on peut les combinner
+        # On compare le mouvement à ajouter au dernier muvement effectué, pour savoir si on peut les combiner
         if fNum == s.listeMvtFaces[-1]: # On tourne deux fois la même face d'affilier: optimisation:
             roTot = ( s.listeMvtRotations[-1] + nbQuarts ) % 4
             if roTot == 0: # Les mouvements s'annules!
@@ -1052,8 +1068,6 @@ class Cube:
         
     def coinsPosJ (s):
         """Place les sommets de la face J à leur position, sans affecter la position, ni la rotation des autres blocs du cube."""
-        global sav
-        sav = s.clonerCube()
         # Trois cas sont possibles:
         # 1) aucun sommet n'est à la bonne position. (1 -> 2)
         # 2) seule un sommet est la bonne position. 
@@ -1107,11 +1121,20 @@ class Cube:
                 
                 currentDeg = s.sommetsRoDuBloc[sommet]
 
-    def toutResoudre (s):
+    def resolutionComplete (s):
         """Fait la résolution complete du cube"""
         etapes = [s.croixW, s.sommetsW, s.belge, s.petiteCroixJ, s.chaise, s.coinsPosJ, s.coinsDegJ, s.genListe]
         i = 0
         for action in etapes:
             action()
             s.listeDesMouvements += "**"  # Commentez cette ligne pour enlever les * 
-        return s.syntheseDesMvts
+
+    def resolution24 (s):
+        """Fait les 24 résolutions du cube, et renvoie le cube contenant la meilleur"""
+        lesCubes = s.generer24()
+        for cube in lesCubes :
+            cube.resolutionComplete()
+        
+        lesDecomptes = [cube.decompte for cube in lesCubes]
+        iMin = picMin(lesDecomptes)
+        return lesCubes[iMin]
