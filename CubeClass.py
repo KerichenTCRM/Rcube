@@ -140,30 +140,7 @@ class Cube:
         
     def __init__ (s, chaineU):
         
-        ### Initialisation (pré-création) de valeurs temporaires:
-        s.viSommets = [None]*8 # Nous pré-créons ces huit valeur, pour pouvoir les affecter
-        s.viAretes = [None]*12 # plus facilement ensuite, en utilisant les indices 'L[i]' uniquement.
-        # vi-* : Ces listes contiendronts la version 'VIsuel' des sommets et des arêtes. (deux ou trois facettes)
-        
-        s.sommetsBlocALaPos = [None]*8 # Numéro du bloc, en fonction de sa position.
-        s.sommetsRoALaPos = [None]*8   # Rotation du bloc trouvé à la position.
-        s.aretesBlocALaPos = [None]*12 #
-        s.aretesRoALaPos = [None]*12   #
-        
-        s.sommetsPosDuBloc = [None]*8 # Position en fonction du numéro de bloc.
-        s.sommetsRoDuBloc = [None]*8  # Rotation, en fonction du numéro de bloc.
-        s.aretesPosDuBloc = [None]*12 # 
-        s.aretesRoDuBloc = [None]*12  # 
-        # Fin de la pré-création #
-
-        ### Initialilisation de la liste des mouvements : celle que renverra l'algorithme:
-        s.listeDesMouvements = ""
-        s.listeMvtRotations = ['']
-        s.listeMvtFaces = ['']
-        s.syntheseDesMvts = ""
-        s.decompte = 0
-
-        ### Données figées, éguales pour toutes les instances:
+        ### Données figées, égales pour toutes les instances:
         s.sommetsPosParitee = [0,1,0,1,1,0,1,0]
         s.BOVR = [1,2,3,4]
         s.OVRB = [2,3,4,1]
@@ -221,14 +198,35 @@ class Cube:
                         [11,8,9,10]] # 5: J
         
         
+        ### Initialisation (pré-création) de listes decrivant le cube, avec des valeurs temporaires:
+        s.viSommets = [None]*8 # Nous pré-créons ces huit valeur, pour pouvoir les affecter
+        s.viAretes = [None]*12 # plus facilement ensuite, en utilisant les indices 'L[i]' uniquement.
+        # vi-* : Ces listes contiendronts la version 'VIsuel' des sommets et des arêtes. (deux ou trois facettes)
+        
+        s.sommetsBlocALaPos = [None]*8 # Numéro du bloc, en fonction de sa position.
+        s.sommetsRoALaPos = [None]*8   # Rotation du bloc trouvé à la position.
+        s.aretesBlocALaPos = [None]*12 #
+        s.aretesRoALaPos = [None]*12   #
+        
+        s.sommetsPosDuBloc = [None]*8 # Position en fonction du numéro de bloc.
+        s.sommetsRoDuBloc = [None]*8  # Rotation, en fonction du numéro de bloc.
+        s.aretesPosDuBloc = [None]*12 # 
+        s.aretesRoDuBloc = [None]*12  # 
+        # Fin de la pré-création #
+
+        ### Initialilisation de(s) liste(s) des mouvements à faire pour résoudre le cube :
+        s.initialiserListesSolutions()
+
         ### Analyse de base des données de génération du cube (chaineU)
-        s.faces = chaineU.split(',')
+        s.initialiseur = chaineU
+        s.faces = s.initialiseur.split(',')
         
         # La facette n°4 (le centre) définit la couleur de la face :
         s.couleurs = [ face[4] for face in s.faces ]      # Le quatrième caractère est le centre de la face.
-        (s.W, s.B, s.O, s.V, s.R, s.J) = s.couleurs       # Nous affectons des noms spécifique à chaque couleur.
+        s.creerCorrespondanceCouleurs() # correspondance nom-couleur, et numéro-couleur :
+       # (s.W, s.B, s.O, s.V, s.R, s.J) = s.couleurs       # Nous affectons des noms spécifique à chaque couleur.
+        # s.numeroDeCouleur = { s.W: 0, s.B: 1, s.O: 2, s.V: 3, s.R: 4, s.J: 5} # Correspondance inverse couleur-nombre.
         (s.Wf, s.Bf, s.Of, s.Vf, s.Rf, s.Jf) = s.faces    # Nous affectons aussi des noms à chaque face.
-        s.numeroDeCouleur = { s.W: 0, s.B: 1, s.O: 2, s.V: 3, s.R: 4, s.J: 5} # Correspondance inverse couleur-nombre.
         ## Définition des tableaux anneauHaut, anneauBas, couronneHaut, couronneMil et couronneBas
         # Notion d'anneau (haut et bas) correspond à une lecture particulière des faces :
         # 5 4 3
@@ -247,43 +245,49 @@ class Cube:
         s.couronneHaut = ''.join([ strg[0:3] for strg in s.faces[1:5]]) # On récupère les couronnes à différentes hauteurs.
         s.couronneMil  = ''.join([ strg[3:6] for strg in s.faces[1:5]]) # Ceci facilitera l'identification ensuite.
         s.couronneBas  = ''.join([ strg[6:9] for strg in s.faces[1:5]])
-        
-        s.groupSommets()
-        s.groupAretes()
-        s.mapSommets()
-        s.mapAretes()
+
+        s.calculerCube()
 
         s.sommeRoAretes = sum(s.aretesRoALaPos)
         s.sommeRoSommets = sum(s.sommetsRoALaPos)
         if s.sommeRoAretes % 2 != 0:
             raise AssertionError("Somme des degrés des arêtes impaire!")
         if s.sommeRoSommets % 3 != 0:
-            raise AssertionError("Somme des degrés des sommets erronnée!")
+            raise AssertionError("Somme des degrés des sommets incorrecte!")
         
         # Fin de __init__
         #(FIN DE __init__!)
      
-    def decrireCube (s):
-        """Renvoie l'état du cube"""
-        return "\n".join([
+    def printCube (s):
+        """Affiche l'état du cube"""
+        print("\n".join([
         "s.sommetsBlocALaPos = {}".format(s.sommetsBlocALaPos),
-        "s.sommetsRoALaPos = {}".format(s.sommetsRoALaPos),
+        "s.sommetsRoALaPos   = {}".format(s.sommetsRoALaPos),
         "s.aretesBlocALaPos = {}".format(s.aretesBlocALaPos),
-        "s.aretesRoALaPos = {}".format(s.aretesRoALaPos),
+        "s.aretesRoALaPos   = {}".format(s.aretesRoALaPos),
         
         #"s.sommetsPosDuBloc = {}".format(s.sommetsPosDuBloc),
-        #"s.sommetsRoDuBloc = {}".format(s.sommetsRoDuBloc),
+        #"s.sommetsRoDuBloc  = {}".format(s.sommetsRoDuBloc),
         #"s.aretesPosDuBloc = {}".format(s.aretesPosDuBloc),
-        #"s.aretesRoDuBloc = {}".format(s.aretesRoDuBloc),
+        #"s.aretesRoDuBloc  = {}".format(s.aretesRoDuBloc),
         
         "s.listeDesMouvements = {}".format(s.listeDesMouvements),
         "s.syntheseDesMvts    = {}".format(s.syntheseDesMvts),
         "s.decompte = {}".format(s.decompte),
-        ])
-     
-    def printCube (s):
-        """Affiche l'état du cube"""
-        print( s.decrireCube() )
+        ]))
+    
+    def creerCorrespondanceCouleurs (s):
+        """Crée les correspondance entre couleurs et numéro de face."""
+        (s.W, s.B, s.O, s.V, s.R, s.J) = s.couleurs             # Nous affectons des noms spécifique à chaque couleur.
+        s.numeroDeCouleur = { s.W: 0, s.B: 1, s.O: 2, s.V: 3, s.R: 4, s.J: 5} # Correspondance inverse couleur-nombre.
+
+    def initialiserListesSolutions (s):
+        """Initialilisation des listes de résolution (réposes) de l'algorithme:"""
+        s.listeDesMouvements = ""
+        s.listeMvtRotations = ['']
+        s.listeMvtFaces = ['']
+        s.syntheseDesMvts = ""
+        s.decompte = 0
      
 # Numérotation arbitraire des sommets:
 # 2 . 1                   
@@ -426,20 +430,39 @@ class Cube:
             s.aretesRoALaPos[pos] = rot
             s.aretesPosDuBloc[bloc_lu] = pos # A chaque arête, on associe la position corespondante
             s.aretesRoDuBloc[bloc_lu] = rot
+
+    def calculerCube (s):
+        """ Création des listes décrivant le cube """
+        s.groupSommets() # Formation des sommets
+        s.groupAretes()  # Fomration des arêtes
+        s.mapSommets()   # Identification et rangement des sommets
+        s.mapAretes()    # ~ ~ des arêtes
+        
+
+    def pariteeRoSommet (s,fNum,oldPos):
+        """Renvoie l'écart de degré d'un sommet pour la rotation d'une des 4 faces latérales du cube"""
+        return ( fNum + s.sommetsPosParitee[oldPos] ) % 2
      
     def diffRoSommets (s,fNum,nbQuarts,oldPos):
-        """Calcule l'écart de degrée d'un sommet à la position old_Pos entre avant et après une rotation de la face de numéro fNum, de nbQuarts quarts de tours. """
-        if fNum != 0 and fNum != 5 and (nbQuarts % 2 != 0) :
-            return 1 + ( fNum + s.sommetsPosParitee[oldPos] ) % 2
+        """Calcule l'écart de degré d'un sommet à la position old_Pos entre avant et après une rotation de la face de numéro fNum, de nbQuarts quarts de tours. """
+        if (not (fNum in [0,5])) and (nbQuarts % 2 != 0) :
+            return 1 + s.pariteeRoSommet(fNum,oldPos)
         else:
             return 0
-        
+     
+    def diffNumRoSommets (s,fNum,nbQuarts,oldPos):
+        """Calcule l'écart de degré d'un sommet à la position old_Pos entre avant et après une rotation de la face de numéro fNum, de nbQuarts quarts de tours. """
+        if (not (fNum in [0,5])) and (nbQuarts % 2 != 0) :
+            return 2 - s.pariteeRoSommet(fNum,oldPos)
+        else:
+            return 0
+
     def rotationSommets (s,fNum,nbQuarts):
         """Applique aux sommets du cube les changements que causent une rotation de la face de numéro fNum, de nbQuarts quarts de tours. """
+        cycle = s.cyclesSommet[fNum]
         # On gère en même temps la position et la rotation
         # On établit d'abord une liste temporaire, indiquant un bloc, sa nouvelle position, et sa nouvelle rotation.
         # On a nbQuarts = 0,1,2 ou 3
-        cycle = s.cyclesSommet[fNum]
         bloc_pos_ro_list = []
         for i in range(-4,0):
             oldPos = cycle[i]
@@ -454,18 +477,36 @@ class Cube:
             s.sommetsBlocALaPos[pos] = bloc
             s.sommetsRoDuBloc[bloc] = ro
             s.sommetsRoALaPos[pos] = ro
+
+    def reNumSommets (s,fNum,nbQuarts):
+        """Renumérote les sommets, suivant le cycle. Change aussi le degré des blocs suivant les instructions."""
+        cycle = s.cyclesSommet[fNum]
+        # On gère en même temps la position et la rotation
+        # On établit d'abord une liste temporaire, indiquant un bloc, sa nouvelle position, et sa nouvelle rotation.
+        bloc_pos_ro_list = []
+        for i in range(-4,0):
+            oldBloc = cycle[i]
+            newBloc = cycle[i+nbQuarts]
+            pos = s.sommetsPosDuBloc[oldBloc]
+            oldRo = s.sommetsRoDuBloc[oldBloc]
+            newRo = (oldRo + s.diffNumRoSommets(fNum,nbQuarts,oldBloc) ) % 3
+            bloc_pos_ro_list.append( (newBloc,pos,newRo) )
+        # Puis on applique ces valeurs:
+        for bloc,pos,ro in bloc_pos_ro_list:
+            s.sommetsPosDuBloc[bloc] = pos
+            s.sommetsBlocALaPos[pos] = bloc
+            s.sommetsRoDuBloc[bloc] = ro
+            s.sommetsRoALaPos[pos] = ro
         
     def diffRoAretes (s,fNum,nbQuarts):
         """ Indique, pour la rotation d'une face, si les arêtes subissent un changement de degré. """
-        return (nbQuarts % 2) * (fNum == 1 or fNum == 3)
+        return (nbQuarts % 2) * (fNum in [1,3])
         
-    def rotationAretes (s,fNum,nbQuarts):
-        """Applique aux arêtes du cube les changements que causent une rotation de la face de numéro fNum, de nbQuarts quarts de tours. """
+    def cycleAretes (s,cycle,nbQuarts,addRo):
+        """Décales les blocs-arêtes suivant le cycle indiqué, de nbQuarts cases"""
         # On gère en même temps la position et la rotation
         # On établit d'abord une liste temporaire, indiquant un bloc, sa nouvelle position, et sa nouvelle rotation.
         # On a nbQuarts = 0,1,2 ou 3
-        cycle = s.cyclesArete[fNum]
-        addRo = s.diffRoAretes(fNum,nbQuarts)
         bloc_pos_ro_list = []
         for i in range(-4,0):
             oldPos = cycle[i]
@@ -480,83 +521,156 @@ class Cube:
             s.aretesBlocALaPos[pos] = bloc
             s.aretesRoDuBloc[bloc] = ro
             s.aretesRoALaPos[pos] = ro
+
+    def cycleNumAretes (s,cycle,nbQuarts,addRo):
+        """Renumérote les arêtes, suivant le cycle. Change aussi la rotation des blocs suivant les instructions."""
+        # On gère en même temps la position et la rotation
+        # On établit d'abord une liste temporaire, indiquant un bloc, sa nouvelle position, et sa nouvelle rotation.
+        bloc_pos_ro_list = []
+        for i in range(-4,0):
+            oldBloc = cycle[i]
+            newBloc = cycle[i+nbQuarts]
+            pos = s.aretesPosDuBloc[oldBloc]
+            oldRo = s.aretesRoDuBloc[oldBloc]
+            newRo = (oldRo + addRo) % 2
+            bloc_pos_ro_list.append( (newBloc,pos,newRo) )
+        # Puis on applique ces valeurs:
+        for bloc,pos,ro in bloc_pos_ro_list:
+            s.aretesPosDuBloc[bloc] = pos
+            s.aretesBlocALaPos[pos] = bloc
+            s.aretesRoDuBloc[bloc] = ro
+            s.aretesRoALaPos[pos] = ro
+        
+    def rotationAretes (s,fNum,nbQuarts):
+        """Applique aux arêtes du cube les changements que causent une rotation de la face de numéro fNum, de nbQuarts quarts de tours. """
+        cycle = s.cyclesArete[fNum]           # On aquière le cycle correspondant
+        addRo = s.diffRoAretes(fNum,nbQuarts) # On calcule la différence de rotation a appliquer
+        s.cycleAretes(cycle,nbQuarts,addRo)   # On opère les changements
+
+    def reNumAretes (s,cNum,nbQuarts):
+        """Applique la renumérotation des arêtes aux arêtes qui comporte la couleur cNum. Change aussi la rotation si nécéssaire."""
+        cycle = s.cyclesArete[cNum]           # On aquière le cycle correspondant
+        addRo = s.diffRoAretes(cNum,nbQuarts) # On calcule la différence de rotation a appliquer
+        s.cycleNumAretes(cycle,nbQuarts,addRo)   # On opère les changements
      
     def rotationFace (s,fNum,nbQuarts):
         """ Applique aux blocs du cube les changements que causent une rotation de la face de numéro fNum, de nbQuarts quarts de tours. """
         s.rotationSommets(fNum,nbQuarts)
         s.rotationAretes(fNum,nbQuarts)
 
-    def tournerCube (s):
+    def clonerCube (s) :
+        """ Clone le cube, et renvoie le clone """
         cube = copy.deepcopy(s)
-        cube.viSommets = []
-        cube.viAretes = []
-        # Déplacement des sommets et arêtes extérieurs
-        cube.rotationFace(s,0,1) # Face blanche
-        cube.rotationFace(s,5,3) # Face jaune
+        # Reinitialisation de certaines valeurs:
+        s.faces = ""
+        s.initialiseur
+        cube.initialiserListesSolutions()
+        s.viSommets = [None]*8
+        s.viAretes = [None]*12
+        return cube
+        
+    def tournerCube (s):
+        """Re-génère le cube, pris de tel sorte que la face blanche soit en haut, et la orange en face de nous."""
+        # Ce "changement de base" s'effectue en deux étapes:
+        # * D'abord on déplace tout les blocs vers leur nouvelle place (en faisant les bons changements de rotation).
+        # * Ensuite, on renumérote les blocs et on calcule les changements de degré à faire, en fonction des anciens numéros des blocs.
+        
+        # 0 :: Les faces à tourner pour simuler le changement sont ::
+        faceA = 0 # Blanc
+        nbqA = 1 # Sens positif
+        faceB = 5 # Jaune
+        nbqB = 3 # Sens negatif
+        cycleAnneauCentre = [7,6,5,4] # avec nbq = 1
+        
+        # 1 :: Création d'un nouveau cube ::
+        # cube = Cube(s.initialiseur)
+        cube = s.clonerCube()
+        
+        # 2 :: Déplacement des blocs ::
         # Déplacement des centres:
         c = cube.couleurs
-        cube.couleurs = c[0]+c[2:5]+c[1]+c[5]
+        cube.couleurs = [c[0],c[2],c[3],c[4],c[1],c[5]]
+        cube.creerCorrespondanceCouleurs()
+        # Déplacement des sommets et arêtes extérieurs
+        cube.rotationFace(faceA,nbqA)
+        cube.rotationFace(faceB,nbqB)
         # Dépacements des arêtes restantes:
-        cycle = [7,6,5,4]
-        bloc_pos_ro_list = []
-        for i in range(-4,0):
-            oldPos = cycle[i]
-            newPos = cycle[i+1]
-            bloc = s.aretesBlocALaPos[oldPos]
-            oldRo = s.aretesRoALaPos[oldPos]
-            newRo = (oldRo + 1) % 2 # Changement de polarité, pour les centres des faces.
-            bloc_pos_ro_list.append( (bloc,newPos,newRo) )
-        # Puis on applique ces valeurs:
-        for bloc,pos,ro in bloc_pos_ro_list:
-            s.aretesPosDuBloc[bloc] = pos
-            s.aretesBlocALaPos[pos] = bloc
-            s.aretesRoDuBloc[bloc] = ro
-            s.aretesRoALaPos[pos] = ro            
-        # Les couleurs polaires de second ordre sont désormais le orange et le rouge, plutôt que le bleu et le vert.
-        # Changement de polarité, pour les blocs concernés:
-        for num in cycle: # On sélectionne les blocs selon leur numéro
-            pos = s.aretesPosDuBloc[num]
-            ro = (s.aretesRoAlaPos[pos]+1) % 2
-            s.aretesRoDuBloc[num] = ro
-            s.aretesRoAlaPos[pos] = ro
-        # TODO: Changement de rotation pour les sommets
-        groupe1 = [0,5,2,7]
-        groupe2 = [4,1,6,3]
+        cube.cycleAretes(cycleAnneauCentre,1,1) # addRo=1, pour changer le degré des arêtes.
+
+        # 3 :: Renumérotation des blocs, et calcule des degrés ::
+        # Les 'couleurs polaires de repli' sont désormais le orange et le rouge, à la place du bleu et du vert.
+        # Donc seul les degrés des arêtes qui étaient défini par une 'couleur polaire de repli', doivent être changés.
+        cube.reNumAretes(faceA,nbqA)
+        cube.reNumAretes(faceB,nbqB)
+        cube.cycleNumAretes(cycleAnneauCentre,1,1) # On fait la renumérotation, et le changement de polarité.
+        # Il n'y a pas de changement de rotation à faire pour les sommets, car ils utilisent les face blanches et jaunes comme faces polaires, et que le centre de celles-ci n'est pas affécté par le fait de tourner le cube:
+        cube.reNumSommets(faceA,nbqA)
+        cube.reNumSommets(faceB,nbqB)
+        return cube
 
     def basculerCube (s):
-        cube = copy.deepcopy(s)
-        cube.viSommets = []
-        cube.viAretes = []
-        # Déplacement des sommets et arêtes extérieurs
-        cube.rotationFace(s,4,1) # Face rouge
-        cube.rotationFace(s,2,3) # Face oragne
+        """Re-génère le cube, pris de tel sorte que la face verte soit en haut, et la blanche en face de nous."""
+        # Ce "changement de base" s'effectue en deux étapes:
+        # * D'abord on déplace tout les blocs vers leur nouvelle place (en faisant les bons changements de rotation).
+        # * Ensuite, on renumérote les blocs et on calcule les changements de degré à faire, en fonction des anciens numéros des blocs.
+
+        # 0 :: Les faces à tourner pour simuler le changement sont ::
+        faceA = 4 # Rouge
+        nbqA = 1 # Sens positif
+        faceB = 2 # Orange
+        nbqB = 3 # Sens negatif
+        cycleAnneauCentre = [0,8,10,2] # avec nbq = 1
+        
+        # 1 :: Création d'un nouveau cube ::
+        # cube = Cube(s.initialiseur)
+        cube = s.clonerCube()
+        
+        # 2 :: Déplacement des blocs ::
         # Déplacement des centres:
         c = cube.couleurs
-        cube.couleurs = c[3]+c[0]+c[2]+c[5]+c[4]+c[1]
+        cube.couleurs = [c[3],c[0],c[2],c[5],c[4],c[1]]
+        cube.creerCorrespondanceCouleurs()
+        # Déplacement des sommets et arêtes extérieurs
+        cube.rotationFace(faceA,nbqA)
+        cube.rotationFace(faceB,nbqB)
         # Dépacements des arêtes restantes:
-        cycle = [0,8,11,2]
-        bloc_pos_ro_list = []
-        for i in range(-4,0):
-            oldPos = cycle[i]
-            newPos = cycle[i+1]
-            bloc = s.aretesBlocALaPos[oldPos]
-            oldRo = s.aretesRoALaPos[oldPos]
-            newRo = (oldRo + 1) % 2 # Changement de polarité, pour les centres des faces.
-            bloc_pos_ro_list.append( (bloc,newPos,newRo) )
-        # Puis on applique ces valeurs:
-        for bloc,pos,ro in bloc_pos_ro_list:
-            s.aretesPosDuBloc[bloc] = pos
-            s.aretesBlocALaPos[pos] = bloc
-            s.aretesRoDuBloc[bloc] = ro
-            s.aretesRoALaPos[pos] = ro            
-        # Les couleurs polaires de second ordre sont désormais le orange et le rouge, plutôt que le bleu et le vert.
-        # Changement de polarité, pour les blocs concernés:
-        for num in cycle: # On sélectionne les blocs selon leur numéro
-            pos = s.aretesPosDuBloc[num]
-            ro = (s.aretesRoAlaPos[pos]+1) % 2
-            s.aretesRoDuBloc[num] = ro
-            s.aretesRoAlaPos[pos] = ro
-        # TODO: Changement de rotation pour les sommets
+        cube.cycleAretes(cycleAnneauCentre,1,1) # addRo=1, pour changer le degré des arêtes.
+
+        # 3 :: Renumérotation des blocs, et calcule des degrés ::
+        # Les couleurs polaires principale sont désormais le vert et le bleu, à la place du blanc et du jaune.
+        # Donc les degrés des arêtes qui étaient définis par:
+        # << une couleur polaire, gagnant contre une couleur polaire de repli >>, doivent être changés.
+        cube.reNumAretes(faceA,nbqA)
+        cube.reNumAretes(faceB,nbqB)
+        cube.cycleNumAretes(cycleAnneauCentre,1,1) # On fait la renumérotation, et le changement de polarité.
+
+        # Un changement de rotation des sommets est nécéssaire car les faces polaires deviennent la verte et la bleu, à la place de la blanche et la jaune.
+        cube.reNumSommets(faceA,nbqA)
+        cube.reNumSommets(faceB,nbqB)
+        
+        return cube
+
+    def generer4 (s):
+        """Renvoie la liste des quatres cubes obtensibles, en 'tournant' horizontalement le cube"""
+        cubes = [s] # Est la liste des 4 cubes
+        for i in range(3):
+            cubes.append(cubes[-1].tournerCube())
+        return cubes
+
+    def generer24 (s):
+        """Renvoie la liste des vingt-quatres cubes obtensibles, en tournant et en basculant le cube"""
+        base = s   # Est le cube obtenu par basculement.
+        cubes = [] # Est la liste des 24 cubes
+        for i in range(3):
+            quadriCube = base.generer4()
+            cubes += quadriCube
+            base = quadriCube[3].basculerCube()
+            quadriCube = base.generer4()
+            cubes += quadriCube
+            base = quadriCube[1].basculerCube()
+        if base == s.clonerCube():
+            print("genrer24 super!")
+        return cubes
     
     def memMove (s,fNum,nbQuarts):
         """Ajoute (intelligemment) le mouvement donné, à la liste totalisants les mouvements utilisés"""
@@ -918,7 +1032,7 @@ class Cube:
     # Des sommets en haut :  . B . O . V . R . B .
     # Numéro de la face:     . 1 . 2 . 3 . 4 . 1 .
     # Numéro du sommet fixe: 3 . 0 . 1 . 2 . 3 . 0
-    def coinsPermuPosJ (s,sommet_fixe,sns) :
+    def coinsPermuPosJ (s,sommet_fixe,sns):
         """Permute trois sommets de la face J sans affecter les autres blocs du cube.
     `sommet_fixe` indique le numéro (0-3) du sommet qui ne sera pas déplacé.
     `sns` indique le sens (1 ou -1) de la permutation. 1: sens horaire, -1: sens anti-horaire"""
@@ -928,25 +1042,29 @@ class Cube:
         # Si la permutation doit être anti-horaire, on inverse l'ordre des mouvements (et leur direction, voire ci-dessus)
         for i in range(0,8)[::sns]:
             s.move(face[i],nbQuarts[i])
-        
-        
-    def coinsPosJ (s):
-        """Place les sommets de la face J à leur position, sans affecter la position, ni la rotation des autres blocs du cube."""
-        # Trois cas sont possibles:
-        # 1) aucun sommet n'est à la bonne position. dans ce cas: 1 -> 2
-        # 2) seule un sommet est la bonne position. Dans ce cas: 2 -> 3
-        # 3) les quatres sommets sont correctemments placés 3 = OK ;)
-        #
-        #s.printCube()
+    
+    def quelCoinsJEstBienPlaces (s):
         estBienPlace = []
         for i in range(4,8):
             if s.sommetsBlocALaPos[i] == i:
                 estBienPlace.append(i)
-        compte = len(estBienPlace) # On compte le nombre de sommet bien placés
+        return estBienPlace
+        
+    def coinsPosJ (s):
+        """Place les sommets de la face J à leur position, sans affecter la position, ni la rotation des autres blocs du cube."""
+        global sav
+        sav = s.clonerCube()
+        # Trois cas sont possibles:
+        # 1) aucun sommet n'est à la bonne position. (1 -> 2)
+        # 2) seule un sommet est la bonne position. 
+        # 3) les quatres sommets sont correctemments placés.
+        estBienPlace = s.quelCoinsJEstBienPlaces()
+        compte = len(estBienPlace) # On compte le nombre de sommets bien placés
 
-        if compte == 0: # Si aucun n'est bien placé, le seul cas possible est que les sommets soit chacun à l'opposé de leur position.
-            s.coinsPermuPosJ(0,1)  # L'enchaînement de ces deux suites de mouvements
-            s.coinsPermuPosJ(3,1) # Résoud la situation.
+        if compte == 0: # Si aucun n'est bien placé, 
+            s.coinsPermuPosJ(0,1)  # n'importe quels mouvement démèle la situation
+            estBienPlace = s.quelCoinsJEstBienPlaces()
+            compte = len(estBienPlace) # On (re)compte le nombre de sommets bien placés
         
         if compte == 1: # Un unique sommet est bien placé
             fixe = estBienPlace[0] % 4 + 4 # On trouve le sommet qui est bien place
@@ -955,12 +1073,18 @@ class Cube:
             sens = (1 if s.sommetsBlocALaPos[oppose] == suivant else -1) # On établi le sens de la permutation
             s.coinsPermuPosJ(fixe,sens)
         
-        if compte in [2,3]: # Il ne peut jamais y avoir exactement 2, ni 3 sommets bien positionnés.
-            return "Erreur: Cube irrésolvable car mal remonté: imparité des positions sommets-arêtes."
+        if compte == 2: # Il ne peut jamais y avoir exactement 2 sommets bien positionnés.
+            raise AssertionError("coinsPosJ: Cube irrésolvable car mal remonté: imparité des positions sommets-arêtes.")
+
+        if compte == 3:
+            raise AssertionError("coinsPosJ: Nombre de coins mal placé impossible (1 coins): Érreur à l'identification des blocs ?")
         
-        compte = sum([ s.sommetsBlocALaPos[i] == i for i in range(4,8)]) # On recompte le nombre de sommet bien placés
-        if compte != 4: # Pour s'assurer que tout à bien fonctionné.
-            return "Erreur lors du placement des sommets de la dernières face."
+        compte = sum([ s.sommetsBlocALaPos[i] == i for i in range(4,8)]) # On recompte le nombre de sommet bien placés,
+        if compte != 4: # pour s'assurer que tout à bien fonctionné.
+            raise AssertionError("\n".join(["coinsPosJ: Echec du placement des sommets de la dernières face:",
+                                            "estBienPlace = {}".format(estBienPlace),
+                                            "compte(finale) = {}".format(compte)
+                                            ]) )
 
     ### Orientation des sommets de la dernière face
     def coinsDegJ (s):
@@ -986,12 +1110,8 @@ class Cube:
     def toutResoudre (s):
         """Fait la résolution complete du cube"""
         etapes = [s.croixW, s.sommetsW, s.belge, s.petiteCroixJ, s.chaise, s.coinsPosJ, s.coinsDegJ, s.genListe]
-        message = ""
         i = 0
-        while not(message) and i < len(etapes):
-            message = etapes[i]()
-            i += 1
+        for action in etapes:
+            action()
             s.listeDesMouvements += "**"  # Commentez cette ligne pour enlever les * 
-        if message:
-            return message
-        return s.listeDesMouvements
+        return s.syntheseDesMvts
