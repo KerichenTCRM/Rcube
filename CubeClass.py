@@ -4,7 +4,8 @@
 import sys
 import copy
 
-# Génération de modèle, pour les tests de bon fonctionnement.
+## Liste de cubes "test":
+
 couleurs = ['w', 'b', 'o', 'v', 'r', 'j']
 (W,B,O,V,R,J) = couleurs
  
@@ -31,6 +32,11 @@ V+B+B+B+B+W+V+R+V, J+O+R+B+O+O+W+O+R, B+V+V+V+V+W+B+O+B, J+R+O+V+R+R+W+R+O,\
 modeleEtape1 = ",".join([J+R+V+W+W+O+W+B+J,\
 O+W+B+J+B+W+R+V+W, R+B+J+R+O+V+V+R+V, R+B+O+J+V+J+J+V+W, B+O+B+O+R+B+R+O+B,\
                                                           V+V+W+W+J+R+O+J+O])
+
+# Liste de cubes mélangés:
+melanges=[
+"ojrbwrbbb,rojobvrwo,ovjoowbrv,bojvvjwbo,vjwrrwwjv,vvjwjrrbw",
+"vvwowojjj,ovrrbrwvw,vbbbowvrb,orrbvjowb,wwvorwjjr,rbbvjojjo"]
 
 # Chaîne de caractères décrivant un cube pour les tests de l'étape 2
 # Croix blanche faite
@@ -70,6 +76,18 @@ modeleEtape7 = ",".join([9*W,\
                    6*B+R+B+O, 6*O+J+O+O, 9*V, 8*R+J,\
                                    J+J+B+J+J+J+J+J+B])
 
+## Fonction utilisateur:
+
+def interactionUtilisateur (description = sys.argv[-1]):
+    """Cette fonction doit être executée pour faire fonction le programme"""
+    # Obtention de la meilleur solution:
+    cube = resolutionOptimisee(description)
+    # Affichage
+    print("Resolution en {} mouvements, en commençant par la face {}, (::{}::)".format(cube.decompte,cube.couleurs[0],cube.couleurs[1]))
+    afficheur(cube.syntheseDesMvts)
+
+## Fonctions de résolution:
+
 def resoudreLeCube (description):
     """Cette fonction renvoie la liste des gestes à effectuer pour résoudre le cube d'après une chaine de caractère de la forme '*********,*********,*********,*********,*********,*********' ; chaque étoile correspondant à une lettre minuscule relative à la couleur de chaque facette.  """
     cube = Cube(description)
@@ -80,7 +98,7 @@ def resoudreLeCube (description):
         print(L[k:k+2])  
         
 def resoudreEtapes (description):
-    """donne la liste des mouvements à effectuer étapes par étapes"""
+    """Donne la liste des mouvements à effectuer étape par étape"""
     cube = Cube(description)
     cube.resolutionComplete()
     L=listeDesMouvementsoptimisée(cube.listeDesMouvements)
@@ -95,83 +113,51 @@ def resoudreEtapes (description):
             A=""
             a=input("")
     print(u)
-        
-def listeDesMouvementsoptimisée(L):
-        A=[]
-        for i in range(0,len(L)-1,2):
-            a=L[i]
-            b=L[i+1]
-            if A and a==A[-2] and b!="*" and A[-1]!="*":
-                b=(int(b)+int(A[-1]))%4
-                A.pop()
-                A.pop()
-            if b!=0:
-                A.append(a)
-                A.append(b)
-        return(A)
 
-def optimisation(L):
-    """créé plusieurs chaînes de caractères correspondant à une vision différente du cube à partir de la chaîne de départ fournie par l'utilisateur"""
-    L1=L[6]+L[3]+L[0]+L[7]+L[4]+L[1]+L[8]+L[5]+L[2]+","+L[20:49]+","+L[10:19]+","+L[52]+L[55]+L[58]+L[51]+L[54]+L[57]+L[50]+L[53]+L[56] #correspond à la description du cube avec W en haut et O en face de soi
-    L2=L[8::-1]+","+L[30:49]+","+L[10:29]+","+L[58:49:-1] #correspond à la description du cube avec W en haut et V en face de soi
-    L3=L[2]+L[5]+L[8]+L[1]+L[4]+L[7]+L[0]+L[3]+L[6]+","+L[40:49]+","+L[10:39]+","+L[56]+L[53]+L[50]+L[57]+L[54]+L[51]+L[58]+L[55]+L[52] #correspond à la description du cube avec W en haut et R en face de soi
-    L4=L[::-1] #correspond à la description du cube avec J en haut et R en face de soi
-    return ([L,L1,L2,L3,L4]) #n'hésitez pas à continuer
-### Coeur du code ###
-# print(resoudreLeCube(sys.argv[-1]))
-#####################
+def resolutionOptimisee (description):
+    """Renvoie la liste des mouvements la plus courte (parmis les 24)"""
+    cube = Cube(description)
+    L = cube.generer24()
+    L[0].resolutionComplete()
+    best = 0
+    bestScore = L[0].decompte
+    
+    for x in range(1,24):
+        L[x].resolutionComplete()
+        score = L[x].decompte
+        if score < bestScore:
+            best = x
+            bestScore = score
+            
+    return L[best]
+    
 
-def interactionUtilisateur (description = sys.argv[-1]):
-    """Cette fonction doit être executée pour faire fonction le programme"""
-    # Obtention de la meilleur solution:
-    cube = Cube(description).resolution24()
-    # Affichage
-    print("Resolution en {} mouvements, en commençant par la face {}, (::{}::)".format(cube.decompte,cube.couleurs[0],cube.couleurs[1]))
-    afficheur(cube.syntheseDesMvts)
+## Fonction de rendu:
 
-def afficheur (texte, qt = 4):
+def afficheur (texte, qt = 5):
     """Affiche par groupe de `qt`, les couples de caractères pris dans le texte."""
     liste = [texte[i:i+2] for i in range(0,len(texte),2)]
     for i in range(0,len(liste),qt):
         input('  ' + " ".join(liste[i:i+qt]))
 
-def picMin (liste):
-    """Compare les éléments de la liste, et renvoie l'indice du minimum"""
-    minim = liste[0]
-    iMin = 0
-    for i,val in enumerate(liste):
-        if val < minim:
-            iMin = i
-            minim = val
-    return iMin
-
+## La classe:
 
 class Cube:
-    #W = "w" # 0 # Dessus [W-J Axe 0]
-    #B = "b" # 1 # En face [B-V Axe 1]
-    #O = "o" # 2 # A droite [O-R Axe 2]
-    #V = "v" # 3 # Derrière
-    #R = "r" # 4 # A gauche
-    #J = "j" # 5 # Dessous
-    
+    # W = "w" # 0 # Dessus [W-J Axe 0]
+    # B = "b" # 1 # En face [B-V Axe 1]
+    # O = "o" # 2 # A droite [O-R Axe 2]
+    # V = "v" # 3 # Derrière
+    # R = "r" # 4 # A gauche
+    # J = "j" # 5 # Dessous
+        
     def __init__ (s, chaineU):
         
-        ### Données figées, égales pour toutes les instances:
+        ## Données figées, égales pour toutes les instances:
         s.sommetsPosParitee = [0,1,0,1,1,0,1,0]
         s.BOVR = [1,2,3,4]
         s.OVRB = [2,3,4,1]
         s.inf = float('inf')
         
-# Numérotation arbitraire des arêtes:
-# . 2 .                   
-# 3 W 1                   
-# . 0 .                   
-# . 0 . . 1 . . 2 . . 3 . 
-# 7 B 4 4 O 5 5 V 6 6 R 7 
-# . 8 . . 9 . . A . . B . 
-#                   . B . 
-# [A = 10]          A J 8 
-# [B = 11]          . 9 . 
         W = 0 ; B = 1 ; O = 2 ; V = 3 ; R = 4 ; J = 5
         s.v = (lambda a,b : 2**a+2**b) # v comme valeur
         v = s.v
@@ -188,17 +174,18 @@ class Cube:
           # et nous avons bien 21 cas traités.
 
 
-# Numérotation arbitraire des sommets et des arêtes:
-# 2 . 1                    #  . 2 .                   
-# . W .                    #  3 W 1                   
-# 3 . 0                    #  . 0 .                   
-# 3 . 0 0 . 1 1 . 2 2 . 3  #  . 0 . . 1 . . 2 . . 3 . 
-# . B . . O . . V . . R .  #  7 B 4 4 O 5 5 V 6 6 R 7 
-# 7 . 4 4 . 5 5 . 6 6 . 7  #  . 8 . . 9 . . A . . B . 
-#                   6 . 7  #                    . B . 
-#                   . J .  #   [A = 10]         A J 8 
-#                   5 . 4  #   [B = 11]         . 9 . 
-       # Tables de correspondance indiquant les positions dont les blocs vont bouger, ainsi que la nouvelle position associée.
+        # Numérotation arbitraire des sommets et des arêtes:
+        # 2 . 1                    #  . 2 .                   
+        # . W .                    #  3 W 1                   
+        # 3 . 0                    #  . 0 .                   
+        # 3 . 0 0 . 1 1 . 2 2 . 3  #  . 0 . . 1 . . 2 . . 3 . 
+        # . B . . O . . V . . R .  #  7 B 4 4 O 5 5 V 6 6 R 7 
+        # 7 . 4 4 . 5 5 . 6 6 . 7  #  . 8 . . 9 . . A . . B . 
+        #                   6 . 7  #                    . B . 
+        #                   . J .  #   [A = 10]         A J 8 
+        #                   5 . 4  #   [B = 11]         . 9 . 
+
+        # Tables de correspondance indiquant les positions dont les blocs vont bouger, ainsi que la nouvelle position associée.
         s.cyclesSommet = [[0,3,2,1], # Rotation de la face 0 : W : Blanche
                          [0,4,7,3], # 1: B : Bleu
                          [0,1,5,4], # 2: O
@@ -214,10 +201,12 @@ class Cube:
                         [11,8,9,10]] # 5: J
         
         
-        ### Initialisation (pré-création) de listes decrivant le cube, avec des valeurs temporaires:
+        ## Initialisation (pré-création) de listes decrivant le cube, avec des valeurs temporaires:
         s.viSommets = [None]*8 # Nous pré-créons ces huit valeur, pour pouvoir les affecter
         s.viAretes = [None]*12 # plus facilement ensuite, en utilisant les indices 'L[i]' uniquement.
         # vi-* : Ces listes contiendronts la version 'VIsuel' des sommets et des arêtes. (deux ou trois facettes)
+        # servent pour l'identification du cube
+        
         
         s.sommetsBlocALaPos = [None]*8 # Numéro du bloc, en fonction de sa position.
         s.sommetsRoALaPos = [None]*8   # Rotation du bloc trouvé à la position.
@@ -230,16 +219,16 @@ class Cube:
         s.aretesRoDuBloc = [None]*12  # 
         # Fin de la pré-création #
 
-        ### Initialilisation de(s) liste(s) des mouvements à faire pour résoudre le cube :
+        ## Initialilisation de(s) liste(s) des mouvements à faire pour résoudre le cube :
         s.initialiserListesSolutions()
 
-        ### Analyse de base des données de génération du cube (chaineU)
+        ## Analyse de base des données de génération du cube (chaineU)
         s.initialiseur = chaineU
         s.faces = s.initialiseur.split(',')
         
         # La facette n°4 (le centre) définit la couleur de la face :
         s.couleurs = [ face[4] for face in s.faces ]      # Le quatrième caractère est le centre de la face.
-        s.creerCorrespondanceCouleurs() # correspondance nom-couleur, et numéro-couleur
+        s.creerCorrespondanceCouleurs() # correspondance nom-couleur, et numéro-couleur.
         (s.Wf, s.Bf, s.Of, s.Vf, s.Rf, s.Jf) = s.faces    # Nous affectons aussi des noms à chaque face.
         
         ## Définition des tableaux anneauHaut, anneauBas, couronneHaut, couronneMil et couronneBas
@@ -254,6 +243,7 @@ class Cube:
         # 6 . 2 - Face du bas, numérotation de l'anneau (aussi) # 0 3 6
         # 5 4 3
         # Code correspondant:
+        
         Wf,Jf = s.Wf, s.Jf
         s.anneauHaut   = ''.join([ Wf[7:9], Wf[5], Wf[0:3][::-1], Wf[3], Wf[6]])
         s.anneauBas    = ''.join([ Jf[5], Jf[8:5:-1], Jf[3], Jf[0:3]])
@@ -271,8 +261,32 @@ class Cube:
             raise AssertionError("Somme des degrés des sommets incorrecte!")
         
         # Fin de __init__
-        #(FIN DE __init__!)
-     
+    
+    ## Fonctions initialisatrices:
+
+    def initialiserListesSolutions (s):
+        """Initialilisation des listes de résolution (réponses) de l'algorithme:"""
+        s.listeDesMouvements = ""
+        s.listeMvtRotations = ['']
+        s.listeMvtFaces = ['']
+        s.syntheseDesMvts = ""
+        s.decompte = 0
+    
+    def creerCorrespondanceCouleurs (s):
+        """Crée les correspondances entre couleurs et numéros de face."""
+        (s.W, s.B, s.O, s.V, s.R, s.J) = s.couleurs             # Nous affectons des noms spécifique à chaque couleur.
+        s.numeroDeCouleur = { s.W: 0, s.B: 1, s.O: 2, s.V: 3, s.R: 4, s.J: 5} # Correspondance inverse couleur-nombre.
+        
+
+    def calculerCube (s):
+        """ Création des listes décrivant le cube """
+        s.groupSommets() # Formation des sommets
+        s.groupAretes()  # Fomration des arêtes
+        s.mapSommets()   # Identification et rangement des sommets
+        s.mapAretes()    # ~ ~ des arêtes
+    
+    ## Fonction auto-portrait:
+    
     def printCube (s):
         """Affiche l'état du cube"""
         s.genListe()
@@ -286,35 +300,36 @@ class Cube:
         #"s.sommetsRoDuBloc  = {}".format(s.sommetsRoDuBloc),
         #"s.aretesPosDuBloc = {}".format(s.aretesPosDuBloc),
         #"s.aretesRoDuBloc  = {}".format(s.aretesRoDuBloc),
-        
         #"s.listeDesMouvements = {}".format(s.listeDesMouvements),
+        
         "s.syntheseDesMvts    = {}".format(s.syntheseDesMvts),
         "s.decompte = {}".format(s.decompte),
         ]))
     
-    def creerCorrespondanceCouleurs (s):
-        """Crée les correspondance entre couleurs et numéro de face."""
-        (s.W, s.B, s.O, s.V, s.R, s.J) = s.couleurs             # Nous affectons des noms spécifique à chaque couleur.
-        s.numeroDeCouleur = { s.W: 0, s.B: 1, s.O: 2, s.V: 3, s.R: 4, s.J: 5} # Correspondance inverse couleur-nombre.
-
-    def initialiserListesSolutions (s):
-        """Initialilisation des listes de résolution (réposes) de l'algorithme:"""
-        s.listeDesMouvements = ""
-        s.listeMvtRotations = ['']
-        s.listeMvtFaces = ['']
-        s.syntheseDesMvts = ""
-        s.decompte = 0
-     
-# Numérotation arbitraire des sommets:
-# 2 . 1                   
-# . W .                   
-# 3 . 0                   
-# 3 . 0 0 . 1 1 . 2 2 . 3 
-# . B . . O . . V . . R . 
-# 7 . 4 4 . 5 5 . 6 6 . 7 
-#                   6 . 7 
-#                   . J . 
-#                   5 . 4
+    ## Fonctions d'identification:
+    
+    # Le regroupement des sommets et des arêtes:
+    # Pour les SOMMETS :      # Pour les ARÊTES :
+    #        CECI :           #        CECI :           
+    # 0 . 2                   # . 1 .                   
+    # . W .                   # 3 W 5                   
+    # 6 . 8                   # . 7 .                   
+    # 0 . 2 0 . 2 0 . 2 0 . 2 # . 1 . . 1 . . 1 . . 1 . 
+    # . B . . O . . V . . R . # 3 B 5 3 O 5 3 V 5 3 R 5 
+    # 6 . 8 6 . 8 6 . 8 6 . 8 # . 7 . . 7 . . 7 . . 7 . 
+    #                   0 . 2 #                   . 1 . 
+    #                   . J . #                   3 J 5 
+    #                   6 . 8 #                   . 7 . 
+    #      DOIT DEVENIR :     #      DOIT DEVENIR :     
+    # 2 . 1                   # . 2 .                   
+    # . W .                   # 3 W 1                   
+    # 3 . 0                   # . 0 .                   
+    # 3 . 0 0 . 1 1 . 2 2 . 3 # . 0 . . 1 . . 2 . . 3 . 
+    # . B . . O . . V . . R . # 7 B 4 4 O 5 5 V 6 6 R 7 
+    # 7 . 4 4 . 5 5 . 6 6 . 7 # . 8 . . 9 . . A . . B . 
+    #                   6 . 7 #                   . B . 
+    #                   . J . # [A = 10]          A J 8 
+    #                   5 . 4 # [B = 11]          . 9 . 
 
     def identifieSommet (s,bloc3f):
         """ Caractérise un sommet du cube, à partir de trois couleurs d'un bloc.""" 
@@ -347,17 +362,7 @@ class Cube:
         # Si bloc3f contient du blanc: 0 <= num < 4
         # Si bloc3f contient du jaune: 4 <= num < 8 
         return (num,orientation)
-
-# Numérotation arbitraire des arêtes:
-# . 2 .                   
-# 3 W 1                   
-# . 0 .                   
-# . 0 . . 1 . . 2 . . 3 . 
-# 7 B 4 4 O 5 5 V 6 6 R 7 
-# . 8 . . 9 . . A . . B . 
-#                   . B . 
-# [A = 10]          A J 8 
-# [B = 11]          . 9 . 
+        
     def identifieArete (s,bloc2f):
         """ Caractérise une arête du cube, à partir de deux couleurs d'un bloc."""
         # bloc2f contient deux couleurs: deux facettes
@@ -377,30 +382,6 @@ class Cube:
         if orientation == 2: # Si l'orientation n'est toujours pas déterminée, c'est qu'il y a une erreur.
             raise AssertionErreur(" L'orientation des arêtes n'a pas pu être déterminée ")
         return (num,orientation)
-
-
-# Le regroupement des sommets et des arêtes:
-# Pour les SOMMETS :      # Pour les ARÊTES :
-#        CECI :           #        CECI :           
-# 0 . 2                   # . 1 .                   
-# . W .                   # 3 W 5                   
-# 6 . 8                   # . 7 .                   
-# 0 . 2 0 . 2 0 . 2 0 . 2 # . 1 . . 1 . . 1 . . 1 . 
-# . B . . O . . V . . R . # 3 B 5 3 O 5 3 V 5 3 R 5 
-# 6 . 8 6 . 8 6 . 8 6 . 8 # . 7 . . 7 . . 7 . . 7 . 
-#                   0 . 2 #                   . 1 . 
-#                   . J . #                   3 J 5 
-#                   6 . 8 #                   . 7 . 
-#      DOIT DEVENIR :     #      DOIT DEVENIR :     
-# 2 . 1                   # . 2 .                   
-# . W .                   # 3 W 1                   
-# 3 . 0                   # . 0 .                   
-# 3 . 0 0 . 1 1 . 2 2 . 3 # . 0 . . 1 . . 2 . . 3 . 
-# . B . . O . . V . . R . # 7 B 4 4 O 5 5 V 6 6 R 7 
-# 7 . 4 4 . 5 5 . 6 6 . 7 # . 8 . . 9 . . A . . B . 
-#                   6 . 7 #                   . B . 
-#                   . J . # [A = 10]          A J 8 
-#                   5 . 4 # [B = 11]          . 9 . 
 
     def groupSommets (s):
         """Regroupe les facettes des sommets par 2, selon leur numéro, en vue de leur identification"""
@@ -446,15 +427,127 @@ class Cube:
             s.aretesRoALaPos[pos] = rot
             s.aretesPosDuBloc[bloc_lu] = pos # A chaque arête, on associe la position corespondante
             s.aretesRoDuBloc[bloc_lu] = rot
-
-    def calculerCube (s):
-        """ Création des listes décrivant le cube """
-        s.groupSommets() # Formation des sommets
-        s.groupAretes()  # Fomration des arêtes
-        s.mapSommets()   # Identification et rangement des sommets
-        s.mapAretes()    # ~ ~ des arêtes
+            
+    ## Fonctions d'optimisation:
+    
+    def clonerCube (s) :
+        """ Clone le cube, et renvoie le clone """
+        cube = copy.deepcopy(s)
+        # Reinitialisation de certaines valeurs:
+        s.faces = ""
+        s.initialiseur
+        cube.initialiserListesSolutions()
+        s.viSommets = [None]*8
+        s.viAretes = [None]*12
+        return cube
         
+    def tournerCube (s):
+        """Re-génère le cube, pris de tel sorte que la face blanche soit en haut, et la orange en face de nous."""
+        # Ce "changement de base" s'effectue en deux étapes:
+        # * D'abord on déplace tout les blocs vers leur nouvelle place (en faisant les bons changements de rotation).
+        # * Ensuite, on renumérote les blocs et on calcule les changements de degré à faire, en fonction des anciens numéros des blocs.
+        
+        # 0 :: Les faces à tourner pour simuler le changement sont ::
+        faceA = 0 # Blanc
+        nbqA = 1 # Sens positif
+        faceB = 5 # Jaune
+        nbqB = 3 # Sens negatif
+        cycleAnneauCentre = [7,6,5,4] # avec nbq = 1
+        
+        # 1 :: Création d'un nouveau cube ::
+        # cube = Cube(s.initialiseur)
+        cube = s.clonerCube()
+        
+        # 2 :: Déplacement des blocs ::
+        # Déplacement des centres:
+        c = cube.couleurs
+        cube.couleurs = [c[0],c[2],c[3],c[4],c[1],c[5]]
+        cube.creerCorrespondanceCouleurs()
+        # Déplacement des sommets et arêtes extérieurs
+        cube.rotationFace(faceA,nbqA)
+        cube.rotationFace(faceB,nbqB)
+        # Dépacements des arêtes restantes:
+        cube.cycleAretes(cycleAnneauCentre,1,1) # addRo=1, pour changer le degré des arêtes.
 
+        # 3 :: Renumérotation des blocs, et calcule des degrés ::
+        # Les 'couleurs polaires de repli' sont désormais le orange et le rouge, à la place du bleu et du vert.
+        # Donc seul les degrés des arêtes qui étaient défini par une 'couleur polaire de repli', doivent être changés.
+        cube.reNumAretes(faceA,nbqA)
+        cube.reNumAretes(faceB,nbqB)
+        cube.cycleNumAretes(cycleAnneauCentre,1,1) # On fait la renumérotation, et le changement de polarité.
+        # Il n'y a pas de changement de rotation à faire pour les sommets, car ils utilisent les face blanches et jaunes comme faces polaires, et que le centre de celles-ci n'est pas affécté par le fait de tourner le cube:
+        cube.reNumSommets(faceA,nbqA)
+        cube.reNumSommets(faceB,nbqB)
+        return cube
+
+    def basculerCube (s):
+        """Re-génère le cube, pris de tel sorte que la face verte soit en haut, et la blanche en face de nous."""
+        # Ce "changement de base" s'effectue en deux étapes:
+        # * D'abord on déplace tout les blocs vers leur nouvelle place (en faisant les bons changements de rotation).
+        # * Ensuite, on renumérote les blocs et on calcule les changements de degré à faire, en fonction des anciens numéros des blocs.
+
+        # 0 :: Les faces à tourner pour simuler le changement sont ::
+        faceA = 4 # Rouge
+        nbqA = 1 # Sens positif
+        faceB = 2 # Orange
+        nbqB = 3 # Sens negatif
+        cycleAnneauCentre = [0,8,10,2] # avec nbq = 1
+        
+        # 1 :: Création d'un nouveau cube ::
+        # cube = Cube(s.initialiseur)
+        cube = s.clonerCube()
+        
+        # 2 :: Déplacement des blocs ::
+        # Déplacement des centres:
+        c = cube.couleurs
+        cube.couleurs = [c[3],c[0],c[2],c[5],c[4],c[1]]
+        cube.creerCorrespondanceCouleurs()
+        # Déplacement des sommets et arêtes extérieurs
+        cube.rotationFace(faceA,nbqA)
+        cube.rotationFace(faceB,nbqB)
+        # Dépacements des arêtes restantes:
+        cube.cycleAretes(cycleAnneauCentre,1,1) # addRo=1, pour changer le degré des arêtes.
+
+        # 3 :: Renumérotation des blocs, et calcule des degrés ::
+        # Les couleurs polaires principale sont désormais le vert et le bleu, à la place du blanc et du jaune.
+        # Donc les degrés des arêtes qui étaient définis par:
+        # << une couleur polaire, gagnant contre une couleur polaire de repli >>, doivent être changés.
+        cube.reNumAretes(faceA,nbqA)
+        cube.reNumAretes(faceB,nbqB)
+        cube.cycleNumAretes(cycleAnneauCentre,1,1) # On fait la renumérotation, et le changement de polarité.
+
+        # Un changement de rotation des sommets est nécéssaire car les faces polaires deviennent la verte et la bleu, à la place de la blanche et la jaune.
+        cube.reNumSommets(faceA,nbqA)
+        cube.reNumSommets(faceB,nbqB)
+        
+        return cube
+
+
+    def generer4 (s):
+        """Renvoie la liste des quatres cubes obtensibles, en 'tournant' horizontalement le cube"""
+        cubes = [s] # Est la liste des 4 cubes
+        for i in range(3):
+            cubes.append(cubes[-1].tournerCube())
+        return cubes
+
+    def generer24 (s):
+        """Renvoie la liste des vingt-quatres cubes obtensibles, en tournant et en basculant le cube"""
+        base = s   # Est le cube obtenu par basculement.
+        cubes = [] # Est la liste des 24 cubes
+        for i in range(3):
+            quadriCube = base.generer4()
+            cubes += quadriCube
+            base = quadriCube[3].basculerCube()
+            quadriCube = base.generer4()
+            cubes += quadriCube
+            base = quadriCube[1].basculerCube()
+        if base == s.clonerCube():
+            print("genrer24 super!")
+        return cubes
+    
+    ## Fonctions de gestion des mouvements:
+    
+    
     def pariteeRoSommet (s,fNum,oldPos):
         """Renvoie l'écart de degré d'un sommet pour la rotation d'une des 4 faces latérales du cube"""
         return ( fNum + s.sommetsPosParitee[oldPos] ) % 2
@@ -573,120 +666,8 @@ class Cube:
         """ Applique aux blocs du cube les changements que causent une rotation de la face de numéro fNum, de nbQuarts quarts de tours. """
         s.rotationSommets(fNum,nbQuarts)
         s.rotationAretes(fNum,nbQuarts)
-
-    def clonerCube (s) :
-        """ Clone le cube, et renvoie le clone """
-        cube = copy.deepcopy(s)
-        # Reinitialisation de certaines valeurs:
-        s.faces = ""
-        s.initialiseur
-        cube.initialiserListesSolutions()
-        s.viSommets = [None]*8
-        s.viAretes = [None]*12
-        return cube
-        
-    def tournerCube (s):
-        """Re-génère le cube, pris de tel sorte que la face blanche soit en haut, et la orange en face de nous."""
-        # Ce "changement de base" s'effectue en deux étapes:
-        # * D'abord on déplace tout les blocs vers leur nouvelle place (en faisant les bons changements de rotation).
-        # * Ensuite, on renumérote les blocs et on calcule les changements de degré à faire, en fonction des anciens numéros des blocs.
-        
-        # 0 :: Les faces à tourner pour simuler le changement sont ::
-        faceA = 0 # Blanc
-        nbqA = 1 # Sens positif
-        faceB = 5 # Jaune
-        nbqB = 3 # Sens negatif
-        cycleAnneauCentre = [7,6,5,4] # avec nbq = 1
-        
-        # 1 :: Création d'un nouveau cube ::
-        # cube = Cube(s.initialiseur)
-        cube = s.clonerCube()
-        
-        # 2 :: Déplacement des blocs ::
-        # Déplacement des centres:
-        c = cube.couleurs
-        cube.couleurs = [c[0],c[2],c[3],c[4],c[1],c[5]]
-        cube.creerCorrespondanceCouleurs()
-        # Déplacement des sommets et arêtes extérieurs
-        cube.rotationFace(faceA,nbqA)
-        cube.rotationFace(faceB,nbqB)
-        # Dépacements des arêtes restantes:
-        cube.cycleAretes(cycleAnneauCentre,1,1) # addRo=1, pour changer le degré des arêtes.
-
-        # 3 :: Renumérotation des blocs, et calcule des degrés ::
-        # Les 'couleurs polaires de repli' sont désormais le orange et le rouge, à la place du bleu et du vert.
-        # Donc seul les degrés des arêtes qui étaient défini par une 'couleur polaire de repli', doivent être changés.
-        cube.reNumAretes(faceA,nbqA)
-        cube.reNumAretes(faceB,nbqB)
-        cube.cycleNumAretes(cycleAnneauCentre,1,1) # On fait la renumérotation, et le changement de polarité.
-        # Il n'y a pas de changement de rotation à faire pour les sommets, car ils utilisent les face blanches et jaunes comme faces polaires, et que le centre de celles-ci n'est pas affécté par le fait de tourner le cube:
-        cube.reNumSommets(faceA,nbqA)
-        cube.reNumSommets(faceB,nbqB)
-        return cube
-
-    def basculerCube (s):
-        """Re-génère le cube, pris de tel sorte que la face verte soit en haut, et la blanche en face de nous."""
-        # Ce "changement de base" s'effectue en deux étapes:
-        # * D'abord on déplace tout les blocs vers leur nouvelle place (en faisant les bons changements de rotation).
-        # * Ensuite, on renumérote les blocs et on calcule les changements de degré à faire, en fonction des anciens numéros des blocs.
-
-        # 0 :: Les faces à tourner pour simuler le changement sont ::
-        faceA = 4 # Rouge
-        nbqA = 1 # Sens positif
-        faceB = 2 # Orange
-        nbqB = 3 # Sens negatif
-        cycleAnneauCentre = [0,8,10,2] # avec nbq = 1
-        
-        # 1 :: Création d'un nouveau cube ::
-        # cube = Cube(s.initialiseur)
-        cube = s.clonerCube()
-        
-        # 2 :: Déplacement des blocs ::
-        # Déplacement des centres:
-        c = cube.couleurs
-        cube.couleurs = [c[3],c[0],c[2],c[5],c[4],c[1]]
-        cube.creerCorrespondanceCouleurs()
-        # Déplacement des sommets et arêtes extérieurs
-        cube.rotationFace(faceA,nbqA)
-        cube.rotationFace(faceB,nbqB)
-        # Dépacements des arêtes restantes:
-        cube.cycleAretes(cycleAnneauCentre,1,1) # addRo=1, pour changer le degré des arêtes.
-
-        # 3 :: Renumérotation des blocs, et calcule des degrés ::
-        # Les couleurs polaires principale sont désormais le vert et le bleu, à la place du blanc et du jaune.
-        # Donc les degrés des arêtes qui étaient définis par:
-        # << une couleur polaire, gagnant contre une couleur polaire de repli >>, doivent être changés.
-        cube.reNumAretes(faceA,nbqA)
-        cube.reNumAretes(faceB,nbqB)
-        cube.cycleNumAretes(cycleAnneauCentre,1,1) # On fait la renumérotation, et le changement de polarité.
-
-        # Un changement de rotation des sommets est nécéssaire car les faces polaires deviennent la verte et la bleu, à la place de la blanche et la jaune.
-        cube.reNumSommets(faceA,nbqA)
-        cube.reNumSommets(faceB,nbqB)
-        
-        return cube
-
-    def generer4 (s):
-        """Renvoie la liste des quatres cubes obtensibles, en 'tournant' horizontalement le cube"""
-        cubes = [s] # Est la liste des 4 cubes
-        for i in range(3):
-            cubes.append(cubes[-1].tournerCube())
-        return cubes
-
-    def generer24 (s):
-        """Renvoie la liste des vingt-quatres cubes obtensibles, en tournant et en basculant le cube"""
-        base = s   # Est le cube obtenu par basculement.
-        cubes = [] # Est la liste des 24 cubes
-        for i in range(3):
-            quadriCube = base.generer4()
-            cubes += quadriCube
-            base = quadriCube[3].basculerCube()
-            quadriCube = base.generer4()
-            cubes += quadriCube
-            base = quadriCube[1].basculerCube()
-        if base == s.clonerCube():
-            print("genrer24 super!")
-        return cubes
+    
+    ## Fonctions d'application des mouvements:
     
     def memMove (s,fNum,nbQuarts):
         """Ajoute (intelligemment) le mouvement donné, à la liste totalisants les mouvements utilisés"""
@@ -700,25 +681,7 @@ class Cube:
                 s.listeMvtRotations[-1] = roTot
         else: # On ajoute simplement les mouvement à la liste.
             s.listeMvtFaces.append(fNum)
-            s.listeMvtRotations.append(nbQuarts)        
-
-    def genListe (s):
-        """Génère la liste (chaine) des mouvements à effectuer pour finir le cube"""
-        s.syntheseDesMvts = ""
-        s.decompte = len(s.listeMvtFaces)-1
-        if s.decompte != len(s.listeMvtRotations)-1:
-            raise AssertionError("Erreur dans la memorisation des mouvements: len(s.listeMvtFaces) == {} != {} == len(s.listeMvtRotations)".format(len(s.listeMvtFaces),len(s.listeMvtRotations)))
-        for i in range(1,s.decompte+1): #! on ignore le premier élément, c.f. initialisation des listes
-            nbQuarts = s.listeMvtRotations[i]
-            if nbQuarts == 1:
-                action = "+"
-            elif nbQuarts == 2:
-                action = "²"
-            elif nbQuarts == 3:
-                action = "-"
-            else: # nbQuarts == 0 
-                raise AssertionError("Rotation nulle trouvée dans listeMvtRotations à l'indice {}.".format(i))
-            s.syntheseDesMvts += s.couleurs[s.listeMvtFaces[i]] + action
+            s.listeMvtRotations.append(nbQuarts)
             
     
     def move (s,fNum,nbQuarts): # Finalement, il semble plus simple de n'utiliser que le numero des faces.
@@ -759,11 +722,44 @@ class Cube:
         for i in range(0, len(instruction), 2):
             s.act(instruction[i:i+2])
 
-    ## Réalisation du cube, étape par étape ##
-    ## Etape 1: Les arêtes de la première face ##
+    def genListe (s):
+        """Génère la liste (chaine) des mouvements à effectuer pour finir le cube""" # Fusionne listMvtFaces et listeMvtRotations
+        s.syntheseDesMvts = ""
+        s.decompte = len(s.listeMvtFaces)-1
+        if s.decompte != len(s.listeMvtRotations)-1:
+            raise AssertionError("Erreur dans la memorisation des mouvements: len(s.listeMvtFaces) == {} != {} == len(s.listeMvtRotations)".format(len(s.listeMvtFaces),len(s.listeMvtRotations)))
+        for i in range(1,s.decompte+1): #! on ignore le premier élément, c.f. initialisation des listes
+            nbQuarts = s.listeMvtRotations[i]
+            if nbQuarts == 1:
+                action = "+"
+            elif nbQuarts == 2:
+                action = "²"
+            elif nbQuarts == 3:
+                action = "-"
+            else: # nbQuarts == 0 
+                raise AssertionError("Rotation nulle trouvée dans listeMvtRotations à l'indice {}.".format(i))
+            s.syntheseDesMvts += s.couleurs[s.listeMvtFaces[i]] + action
+    
+    def resolutionComplete (s):
+        """Fait la résolution complete du cube"""
+        etapes = [s.croixW, s.sommetsW, s.belge, s.petiteCroixJ, s.chaise, s.coinsPosJ, s.coinsDegJ, s.genListe]
+        i = 0
+        for action in etapes:
+            action()
+            s.listeDesMouvements += "**"  # Commentez cette ligne pour enlever les * 
+        return s.syntheseDesMvts
+            
+    #### Réalisation du cube, étape par étape ####
+    
+    ### Etape 1: Les arêtes de la première face ###
+    
     def croixW(s):
         """ Effectue une succession de mouvements établissant une croix de blocs bien placés sur la face s.W (Etape 1) """
         W,J = 0,5 # Les numéros correspondant aux faces
+        
+        if s.aretesPosDuBloc[0] in (0,1,2,3) and s.aretesRoDuBloc[0] == 0:
+            s.move(W,s.aretesPosDuBloc[0])
+            
         for k in range(4):
             arete = [0,1,2,3][k] # Les 4 blocs à déplacer.
             
@@ -793,7 +789,8 @@ class Cube:
                     s.move(s.BOVR[arete-1],3) # -> -----------
                     s.move(W,3)               # -> ----------- # Toujours réorienter la face supérieure !
     
-    ## Etape 2: Les sommets de la première face ##
+    ### Etape 2: Les sommets de la première face ###
+    
     def indicefacedroiteW(s,Posisommet):
         """donne l'indice de la face située à droite du bloc lorsque le bloc se situe en haut à droite de la face centrale avec la face blanche au-dessus"""
         if Posisommet!=3:
@@ -856,7 +853,8 @@ class Cube:
                     s.move(J,3)
                     s.move(s.indiceface(currentPos2),3)
     
-    ## Etape 3: Les arêtes de la deuxième couronne ##    
+    ### Etape 3: Les arêtes de la deuxième couronne ### 
+       
     def belge(s):
         """ Effectue une succession de mouvements établissant la deuxième couronne (Etape 3) """
         
@@ -940,7 +938,8 @@ class Cube:
                     s.move(s.BOVR[currentPos%4],3)
     
     
-## Etape 4: L'orientation des arêtes de la dernière face, càd la petite croix ##
+    ### Etape 4: L'orientation des arêtes de la dernière face, càd la petite croix ###
+    
     def mvtligne(s,fNum3):
         """fait les mouvements correspondant à une configuration de type ligne horizontale avec la face d'indice fNum3 à droite de la ligne horizontale et fNum4 en face de soi"""
         if fNum3!=4: #on créée fNum4, l'indice de la face en dessous de la ligne
@@ -992,17 +991,18 @@ class Cube:
     
     
     
-## Etape 5: positionnement des aretes de la derniere face, càd grande croix ##
-    def petitechaise(s,fNum,cote):              #à renommer si vous voulez
+    ### Etape 5: positionnement des aretes de la derniere face, càd grande croix ###
+    
+    def petitechaise(s,fDessus,fCote,sens):              #à renommer si vous voulez
         """effectue les 8 mouvements de la chaise sur une face et dans un sens donné"""
-        [B,O,V,R,J]=[1,2,3,4,5]
-        s.move(fNum,1+2*cote)   #cote=0 =>droite
-        s.move(J,2)             #cote=1 =>gauche
-        s.move(fNum,3-2*cote)
-        s.move(J,3-2*cote)
-        s.move(fNum,1+2*cote)
-        s.move(J,3-2*cote)
-        s.move(fNum,3-2*cote)
+        [W,B,O,V,R,J]=[0,1,2,3,4,5]
+        s.move(fCote,1+2*sens)        # sens=0 =>droite
+        s.move(fDessus,2)             # sens=1 =>gauche
+        s.move(fCote,3-2*sens)
+        s.move(fDessus,3-2*sens)
+        s.move(fCote,1+2*sens)
+        s.move(fDessus,3-2*sens)
+        s.move(fCote,3-2*sens)
     
     def chaise(s):
         """établit la grande croix/positionne les 4 dernières arêtes (étape 5)"""
@@ -1020,7 +1020,7 @@ class Cube:
             
             if PosV==10:                            #   .o.
                 #Chaise                             #   xox
-                s.petitechaise(R,0)                 #   .o.
+                s.petitechaise(J,R,0)                 #   .o.
                 PosO=s.aretesPosDuBloc[9]
                 PosR=s.aretesPosDuBloc[11]
                     
@@ -1041,13 +1041,17 @@ class Cube:
                 #Chaise gauche
                 b=O
                 c=1
-            s.petitechaise(b,c)
+            s.petitechaise(J,b,c)
      
-### Etape 6: positionnement des sommets de la dernière face ###
-    ## Schéma:
+    ### Etape 6: positionnement des sommets de la dernière face ###
+    
+    ## Position des sommets:
+    
+    # Schéma:
     # Des sommets en haut :  . B . O . V . R . B .
     # Numéro de la face:     . 1 . 2 . 3 . 4 . 1 .
     # Numéro du sommet fixe: 3 . 0 . 1 . 2 . 3 . 0
+    
     def coinsPermuPosJ (s,sommet_fixe,sns):
         """Permute trois sommets de la face J sans affecter les autres blocs du cube.
     `sommet_fixe` indique le numéro (0-3) du sommet qui ne sera pas déplacé.
@@ -1100,41 +1104,73 @@ class Cube:
                                             "compte(finale) = {}".format(compte)
                                             ]) )
 
-    ### Orientation des sommets de la dernière face
+    ## Orientation des sommets:
+    
     def coinsDegJ (s):
         """ Effectue une succession de mouvements établissant une rotation des derniers blocs mal orientés sur la face s.J (Etape 7) """
-        J = 5 # 5 est le numéro de la face jaune
+        W,J = 0,5 # 5 est le numéro de la face jaune
         for k in range(3):
-            sommet = [4,5,6][k]
+            sommet = [4,5,6,7]
+            currentDeg = s.sommetsRoDuBloc[sommet[k]]
             
-            currentDeg = s.sommetsRoDuBloc[sommet]
-            
-            while not(currentDeg == 0):
-                for i in range(2): # Partie 1 face de gauche (k+1), Partie 2 face de droite (k-1)
-                    s.move(s.BOVR[[k+1,k-1][i]],[3,1][i]) # -> combinaison partie (i+1)/2
-                    s.move(J,2)                           # -> ----------- ------ -------
-                    s.move(s.BOVR[[k+1,k-1][i]],[1,3][i]) # -> ----------- ------ -------
-                    s.move(J,[1,3][i])                    # -> ----------- ------ -------
-                    s.move(s.BOVR[[k+1,k-1][i]],[3,1][i]) # -> ----------- ------ -------
-                    s.move(J,[1,3][i])                    # -> ----------- ------ -------
-                    s.move(s.BOVR[[k+1,k-1][i]],[1,3][i]) # -> ----------- ------ -------
-                
-                currentDeg = s.sommetsRoDuBloc[sommet]
+            if currentDeg != 0:
+                if s.sommetsRoDuBloc[sommet[k+1]] != 0:
+                    if currentDeg == 2:
+                        s.petitechaise(J,s.BOVR[k+1],1) # à gauche
+                        s.petitechaise(J,s.BOVR[k-1],0) # puis à droite
+                    else :
+                        s.petitechaise(s.BOVR[k+1],J,0) # à droite
+                        s.petitechaise(s.BOVR[k+1],W,1) # puis à gauche
+                elif s.sommetsRoDuBloc[sommet[(k-1)%4]] != 0:
+                    if currentDeg == 1:
+                        s.petitechaise(J,s.BOVR[k],0) # à droite
+                        s.petitechaise(J,s.BOVR[(k+2)%4],1) # puis à gauche
+                    else :
+                        s.petitechaise(s.BOVR[k],J,1) # à gauche
+                        s.petitechaise(s.BOVR[k],W,0) # puis à droite
+                else:
+                    s.move(s.BOVR[(k+2)%4],1)
+                    if currentDeg == 2:
+                        s.petitechaise(J,s.BOVR[k+1],1) # à gauche
+                        s.petitechaise(J,s.BOVR[k-1],0) # puis à droite
+                    else :
+                        s.petitechaise(s.BOVR[k+1],J,0) # à droite
+                        s.petitechaise(s.BOVR[k+1],W,1) # puis à gauche
+                    s.move(s.BOVR[(k+2)%4],3)
+                    
+## Poubelle:
+def listeDesMouvementsoptimisée(L):
+        A=[]
+        for i in range(0,len(L)-1,2):
+            a=L[i]
+            b=L[i+1]
+            if A and a==A[-2] and b!="*" and A[-1]!="*":
+                b=(int(b)+int(A[-1]))%4
+                A.pop()
+                A.pop()
+            if b!=0:
+                A.append(a)
+                A.append(b)
+        return(A)
 
-    def resolutionComplete (s):
-        """Fait la résolution complete du cube"""
-        etapes = [s.croixW, s.sommetsW, s.belge, s.petiteCroixJ, s.chaise, s.coinsPosJ, s.coinsDegJ, s.genListe]
-        i = 0
-        for action in etapes:
-            action()
-            s.listeDesMouvements += "**"  # Commentez cette ligne pour enlever les * 
-
-    def resolution24 (s):
-        """Fait les 24 résolutions du cube, et renvoie le cube contenant la meilleur"""
-        lesCubes = s.generer24()
-        for cube in lesCubes :
-            cube.resolutionComplete()
-        
-        lesDecomptes = [cube.decompte for cube in lesCubes]
-        iMin = picMin(lesDecomptes)
-        return lesCubes[iMin]
+def optimisation(L):
+    """créé plusieurs chaînes de caractères correspondant à une vision différente du cube à partir de la chaîne de départ fournie par l'utilisateur"""
+    L1=L[6]+L[3]+L[0]+L[7]+L[4]+L[1]+L[8]+L[5]+L[2]+","+L[20:49]+","+L[10:19]+","+L[52]+L[55]+L[58]+L[51]+L[54]+L[57]+L[50]+L[53]+L[56] #correspond à la description du cube avec W en haut et O en face de soi
+    L2=L[8::-1]+","+L[30:49]+","+L[10:29]+","+L[58:49:-1] #correspond à la description du cube avec W en haut et V en face de soi
+    L3=L[2]+L[5]+L[8]+L[1]+L[4]+L[7]+L[0]+L[3]+L[6]+","+L[40:49]+","+L[10:39]+","+L[56]+L[53]+L[50]+L[57]+L[54]+L[51]+L[58]+L[55]+L[52] #correspond à la description du cube avec W en haut et R en face de soi
+    L4=L[::-1] #correspond à la description du cube avec J en haut et R en face de soi
+    return ([L,L1,L2,L3,L4]) #n'hésitez pas à continuer
+    
+def picMin (liste):
+    """Compare les éléments de la liste, et renvoie l'indice du minimum"""
+    minim = liste[0]
+    iMin = 0
+    for i,val in enumerate(liste):
+        if val < minim:
+            iMin = i
+            minim = val
+    return iMin
+    
+### Coeur du code ###
+# print(resoudreLeCube(sys.argv[-1]))
+#####################
