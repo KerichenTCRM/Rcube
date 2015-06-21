@@ -66,4 +66,4 @@ The algorithm's answer will be a move list, a move consisting of two characters:
 * - means an anti-clockwise quarter turn.
 * ² means half a turn (180°).
 
-[The rest of the page wasn't translated, as it was mainly used by authors to organize the development of the project.]
+[The rest of the page wasn't translated, as mainly consists of authors to organize the development of the project.]
