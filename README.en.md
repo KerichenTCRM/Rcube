@@ -1,14 +1,13 @@
 // This document is a translation from the french file README.md
 
 # Rcube
-Rubik's Cube soling algorithme, based on human solving methodes
+Rubik's Cube solving algorithme, based on human solving methodes
 
 ## Welcome on the RCube project page
-The RCube project aims at making an algorithme which, from a list of the sticker's colors describing a cube, produces a list of moves solving the cube.
-Le projet RCube, réalisé par quatre étudiants de première année de classe préparatoire, vise à créer un algorithme, qui à partir de l'énumération des couleurs des faces d'un Rubik's Cube, propose une suite de mouvements solution du cube.
+The RCube project aims at making an algorithm to solve a Rubik's Cube. It will accept a list of facets colors as argument and print a list of moves solving the cube.
 
 ## Some links
-- Link 1 - Website proposing a 20 moves-or-less resolution of the cube you descibe.
+- Link 1 - Website proposing a 20 moves-or-less solution of the cube you descibe.
 
        http://rcombs.me/Cubes/?cube=clean
 
@@ -27,8 +26,8 @@ Le projet RCube, réalisé par quatre étudiants de première année de classe p
 ## Lexique
 * Cube (Rubik's Cube)
 * Face (There are six of them on a cube)
-* Facet (There are 9 of them by face.)
-* Bloc (Cubic mobile part of a cube.)
+* Facet (There are 9 of them by face)
+* Bloc (Cubic mobile part of a cube)
 * Centre (Bloc with one facet, located a the center of a face)
 * Edge (Bloc with two facets, located on two faces. There are four of them by face, and 12 on a cube)
 * Vertex (Bloc with three facets, located on three faces, in the corners. There are four of them by face, and 8 on a cube)
@@ -52,7 +51,6 @@ Le projet RCube, réalisé par quatre étudiants de première année de classe p
 The algorithm, written in python 3, takes one argument: a string of 9*6+(6-1) = 59 characters: six groups of 9 characters, comma-separated (6-1 = 5 commas).
 Remarks: We keep only the last 'word' of the command line.
 For each color of the cube, the user will have to choose a letter (or whatever character he wants, provided he doesn't use twice a character for different colors).
-L'algorithme, codé en python, recevra un argument: une chaine de caractères de 59 caractères: six groupes de 9 caractères, séparés par des virgules (6*9 + 5 = 59). A chaque couleur de facette, l'utilisateur associera une lettre (ou un nombre). Chaque groupe de neuf caractères correspondra aux couleurs des facettes d'une face.
 
 #### Examples
 Entierly undone:
@@ -63,9 +61,9 @@ With the two first rings done:
         wwwwwwwww,bbbbbbjbr,oooooojrr,vvvvvvboo,rrrrrrjvv,bjojjjjjv
 
 ## Algorithm's answer
-The algorithm's answer will be a move list, amove consisting of two characters: the color of the face to be turned, and how many quarters to turn, following this convention:
+The algorithm's answer will be a move list, a move consisting of two characters: the color of the face to be turned, and how many quart-turns to do, following this convention:
 * + means a clockwise quarter turn.
 * - means an anti-clockwise quarter turn.
-* ² means a half turn (180°).
+* ² means half a turn (180°).
 
-[The rest of the page wasn't translated, as it was mainly used by thors to organize the development of the project.]
+[The rest of the page wasn't translated, as it was mainly used by authors to organize the development of the project.]
